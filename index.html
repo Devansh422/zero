@@ -311,7 +311,8 @@
     min-height: 0;
     margin-top: clamp(16px, 2vw, 36px);
     padding: 0 6vw; /* cards start and end on the gutters but still run full-bleed */
-    overflow: hidden;
+    /* clip sideways only: at the minimum image height a card can run taller than this row */
+    overflow-x: clip;
     user-select: none;
   }
   .gallery__image__container {
@@ -570,6 +571,7 @@
     .showcase__scroll { height: 240vh; }
     .showcase__stage { justify-content: center; } /* heading + grid as one centred group */
     .wgrid { flex: none; grid-template-columns: repeat(3, 1fr); }
+    .wgrid__cell { aspect-ratio: 3 / 4; } /* portrait tiles on phones */
     .wgrid__cell:nth-child(6) { grid-column: auto; }
     .wgrid__cell:nth-child(1), .wgrid__cell:nth-child(5), .wgrid__cell:nth-child(9), .wgrid__cell:nth-child(13) { display: none; }
     .oscols { grid-template-columns: repeat(2, 1fr); padding: 8vh 16px 10vh; }
@@ -841,6 +843,7 @@
     }
 
     window.addEventListener('resize', setLimit);
+    document.addEventListener('cards:sized', setLimit);
     setLimit();
     runWhileVisible(section, render);
   })();
@@ -913,11 +916,12 @@
       const area = grid.getBoundingClientRect();
       const c = centre.getBoundingClientRect();
       const [cx, cy] = mid(c), [ax, ay] = mid(area);
-      // big state: as large as the grid area allows at 16:9 (up to 62% of its
+      // big state: as large as the grid area allows, in the cell's shape (up to 62% of its
       // width, 92% on phones). The image is laid out at that big size and scaled *down* into
       // its cell, so it stays sharp (scaling the small cell up would blur it).
-      const bigW = Math.min(area.width * (area.width < 600 ? 0.92 : 0.62), area.height * (16 / 9));
-      const bigH = bigW * (9 / 16);
+      const shape = c.height / c.width; // the cell's shape: 16:9 on desktop, portrait 3:4 on phones
+      const bigW = Math.min(area.width * (area.width < 600 ? 0.92 : 0.62), area.height / shape);
+      const bigH = bigW * shape;
       const img = centre.firstElementChild;
       img.style.inset = 'auto';
       img.style.width = bigW + 'px';
@@ -945,18 +949,38 @@
     runWhileVisible(scroller, render);
   })();
 
-  // Card strips: every white strip gets the height of the tallest one, so the
-  // strips (and the images above them) line up across all five cards
+  // Card sizing. Every white strip gets the height of the tallest one, so the
+  // strips (and the images above them) line up across all five cards. On
+  // desktop the image then takes the height left in the pinned section, but
+  // never less than MIN_IMAGE, and the card's width follows from that height
+  // at 16:9. Strip height depends on card width (text wrapping) and vice
+  // versa, so it settles in two passes. Phones keep their CSS portrait cards.
   (() => {
-    const strips = [...document.querySelectorAll('.gallery__caption')];
+    const MIN_IMAGE = 320; // px, smallest image height on desktop
+    const wrapper = document.querySelector('.gallery__wrapper');
+    const cards = [...document.querySelectorAll('.gallery__item')];
+    const strips = cards.map((card) => card.querySelector('.gallery__caption'));
     const equalize = () => {
       strips.forEach((s) => (s.style.minHeight = ''));
       const tallest = Math.max(...strips.map((s) => s.getBoundingClientRect().height));
       strips.forEach((s) => (s.style.minHeight = tallest + 'px'));
+      return tallest;
     };
-    equalize();
-    document.fonts.ready.then(equalize);
-    window.addEventListener('resize', equalize);
+    const size = () => {
+      cards.forEach((c) => { c.style.width = ''; c.style.height = ''; });
+      let strip = equalize();
+      if (window.innerWidth > 760) {
+        for (let pass = 0; pass < 2; pass++) {
+          const image = Math.max(MIN_IMAGE, wrapper.clientHeight - strip);
+          cards.forEach((c) => { c.style.width = image * (16 / 9) + 'px'; c.style.height = image + strip + 'px'; });
+          strip = equalize();
+        }
+      }
+      document.dispatchEvent(new Event('cards:sized')); // the scroll distance depends on the card widths
+    };
+    size();
+    document.fonts.ready.then(size);
+    window.addEventListener('resize', size);
   })();
 
   // Hero video: plays muted on loop only while it's on screen. With reduced
