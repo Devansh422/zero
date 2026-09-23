@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Zero to Hero — Graphic Design Program</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* Heading font (hero h1, section h2s, enroll h2) */
+  @font-face {
+    font-family: "Display";
+    src: url("BADROCK.woff2") format("woff2"), url("BADROCK.OTF") format("opentype");
+    font-display: swap;
+  }
+
+  :root {
+    --red: #f0233b;
+    --red-dark: #c8102a;
+    --purple: #5b1e6e;
+    --ink: #16161a;
+    --muted: #5d5d66;
+    --canvas: #e4e4e4;
+    --paper: #f7efed;
+    --line: #ececec;
+    --radius-xl: 64px;
+    --nav-h: 84px;
+    --nav-top: 44px; /* space above the floating nav */
+    --brand-gradient: linear-gradient(90deg, #fa3458, #fd4a33, #fd5227);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Inter Tight", system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--canvas);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  section { scroll-margin-top: 100px; }
+
+  /* ───────── Floating navbar ───────── */
+  .nav {
+    position: fixed;
+    top: var(--nav-top);
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 12vw); /* same 6vw side margins as the rest of the page */
+    height: var(--nav-h);
+    padding: 0 12px 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-radius: 18px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(0, 0, 0, 0.03);
+    z-index: 100;
+  }
+  .nav__logo img { height: 62px; display: block; transform:scale(1.4
+    ); transform-origin: left; }
+  .nav__links { display: flex; gap: 4px; list-style: none; }
+  .nav__links a {
+    display: block;
+    padding: 14px 26px;
+    border-radius: 14px;
+    font-size: 22px;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+  }
+  .nav__links a:hover { background: #f3f3f3; }
+  .nav__links a.active { background: var(--red); color: #fff; }
+  .nav__toggle {
+    display: none;
+    width: 44px; height: 44px;
+    border: 0; background: #f3f3f3; border-radius: 12px;
+    font-size: 20px; cursor: pointer;
+  }
+
+  /* ───────── 1. Hero ───────── */
+  /* At least one screen tall. It grows when the full-width 21:9 video needs
+     more room, which is the case on most desktop screens. */
+  .hero-wrap {
+    min-height: 100vh;
+    min-height: 100svh;
+    /* grey strip above the hero: its rounded top edge runs behind the floating
+       nav, 60% of the way down it, so the nav overlays the hero */
+    padding-top: calc(var(--nav-top) + var(--nav-h) * 0.6);
+    display: flex;
+    flex-direction: column;
+  }
+  .hero {
+    --rule-gap: clamp(10px, 1vw, 18px); /* same space above and below the heading's rule */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--paper);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    /* the rest of the nav, then 60px down to the badges */
+    padding: calc(var(--nav-h) * 0.4 + 60px) 6vw clamp(24px, 3vw, 48px);
+  }
+  .hero__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px 16px;
+    flex-wrap: wrap;
+  }
+  /* the badge and "students enrolled" strip, both exported as 493×108 images */
+  .hero__meta img { display: block; height: clamp(40px, 4.5vw, 72px); width: auto; }
+
+  .hero__title { container-type: inline-size; /* 100cqi = the hero's content width */ }
+  .hero__title h1 {
+    font-family: "Display", "Impact", sans-serif;
+    font-weight: 400;
+    /* Edge to edge: the heading is --fit ems wide, so this makes it exactly as
+       wide as the hero's content box (the viewport minus the hero's side
+       padding). 5.52 is "FROM ZERO TO JOB-READY" in Badrock; the script
+       re-measures once the font loads, so edited copy still fits. */
+    font-size: calc(100cqi / var(--fit, 5.52));
+    line-height: 0.9;
+    letter-spacing: -0.01em;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+    /* Gradient text. The vertical padding keeps the glyphs inside the painted
+       background, which a 0.9 line-height would otherwise clip. */
+    padding: 0.06em 0;
+    background: var(--brand-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    /* The baseline sits 0.2125em above this box's bottom (Badrock's metrics at a
+       0.9 line-height, plus the padding), so this puts the rule exactly
+       --rule-gap under the caps */
+    margin: 0 0 calc(var(--rule-gap) - 0.2125em);
+  }
+  @supports not (width: 1cqi) {
+    .hero__title h1 { font-size: calc(88vw / 5.52); }
+  }
+  /* "From zero to" / "job-ready": inline on desktop, stacked on phones (where
+     each gets its own size), so the tracking is set per line */
+  .hero__line { letter-spacing: -0.01em; }
+  /* Gradient rule under the heading, then three features: left, centre, right */
+  .hero__features {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: start;
+    column-gap: 16px;
+    /* the 2px rule, then --rule-gap down to the cap tops (Inter Tight's caps
+       start 0.23em into a 1.2 line) */
+    padding-top: calc(var(--rule-gap) + 2px - 0.23em);
+    background: var(--brand-gradient) top / 100% 2px no-repeat;
+    font-size: clamp(11px, 1.3vw, 20px);
+    font-weight: 500;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+  .hero__features li {
+    background: linear-gradient(90deg, #2e1d4c, #fa3458);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero__features li:nth-child(1) { justify-self: start; }
+  .hero__features li:nth-child(2) { justify-self: center; text-align: center; }
+  .hero__features li:nth-child(3) { justify-self: end; text-align: right; }
+  /* Video block: edge to edge like the heading, always 21:9. Where the screen
+     has height to spare (phones), the wrap takes it and centres the video. */
+  .hero__video-wrap {
+    flex: 1 0 auto;
+    margin-top: clamp(12px, 1.6vw, 28px);
+    display: grid;
+    align-items: center;
+  }
+  .hero__video {
+    width: 100%;
+    aspect-ratio: 21 / 9;
+    overflow: hidden;
+    background: var(--ink); /* behind the poster until it paints */
+  }
+  .hero__video video { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  /* ───────── Intro: CTAs + pitch (height from its content) ───────── */
+  .intro { padding: clamp(32px, 4vw, 72px) 6vw clamp(48px, 6vw, 96px); }
+  .intro__cta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.3em;
+    font-family: "Display", "Impact", sans-serif;
+    font-size: clamp(40px, 5.6vw, 104px);
+    line-height: 1; /* not 0.9: the gradient link is a block box and would clip */
+    text-transform: uppercase;
+  }
+  .intro__cta a { transition: opacity 0.2s; }
+  .intro__cta a:hover { opacity: 0.7; }
+  .intro__cta-enroll {
+    background: var(--brand-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .intro__cta svg {
+    width: 0.55em;
+    height: 0.55em;
+    flex-shrink: 0;
+    transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  /* The arrow points at Enroll now; hovering or focusing View curriculum swings
+     it round to point there instead */
+  .intro__cta:has(a:last-child:hover, a:last-child:focus-visible) svg { transform: rotate(180deg); }
+  .intro__text {
+    max-width: 56em;
+    margin: 0 auto; /* the CTA line's space under its caps already gives the gap */
+    text-align: center;
+    text-wrap: balance;
+    font-size: clamp(18px, 1.8vw, 32px);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 16px 28px;
+    border-radius: 14px;
+    font-weight: 600; font-size: 16px;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+
+  /* White surface for everything after the hero */
+  main > section:not(.hero-wrap) { background: var(--paper); }
+
+  .section-head { text-align: center; padding: 0 6vw; }
+  .eyebrow {
+    display: inline-block;
+    font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--red);
+    margin-bottom: 12px;
+  }
+  .section-head h2 {
+    font-family: "Display", "Impact", sans-serif;
+    font-weight: 400;
+    font-size: clamp(44px, 7vw, 96px);
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+
+  /* ───────── 2. Horizontal parallax gallery ───────── */
+  /* Layout follows the reference: a big title with a label on the right, a
+     rule, a "(1) / What you'll learn" row, then large full-bleed cards with
+     their text in a white strip at the bottom. The whole stage is pinned while
+     page scroll drives the row sideways (see the script).
+     The motion is the Codrops "Horizontal Parallax Gallery", DOM version (not
+     the WebGL version's UV/shader parallax): .gallery__media is its frame and
+     .gallery__media__image its 125%-wide image. */
+  /* Dark section in the page's own colours: ink background, paper text.
+     scroll-margin-top: 0 because the pinned stage clears the nav itself. */
+  #modules { scroll-margin-top: 0; background: var(--ink); color: var(--paper); }
+  .hgallery { position: relative; }
+  .hgallery__pin {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    /* the same gap under the floating nav as under the cards */
+    --pin-gap: clamp(24px, 3vw, 48px);
+    padding: calc(var(--nav-top) + var(--nav-h) + var(--pin-gap)) 0 var(--pin-gap);
+    display: flex;
+    flex-direction: column;
+  }
+  .modules__head {
+    margin: 0 6vw;
+    padding-bottom: clamp(14px, 1.6vw, 28px);
+    border-bottom: 3px solid currentColor;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 8px 24px;
+  }
+  .modules__title,
+  .modules__label {
+    font-family: "Display", "Impact", sans-serif;
+    font-weight: 400;
+    line-height: 0.9;
+    text-transform: uppercase;
+  }
+  .modules__title { font-size: clamp(34px, 4.6vw, 110px); }
+  .modules__label { font-size: clamp(22px, 3.6vw, 86px); }
+  .modules__meta {
+    margin: 0 6vw;
+    padding-top: clamp(10px, 1.2vw, 20px);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    font-size: clamp(15px, 1.3vw, 24px);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .modules__meta span:last-child { grid-column: 2 / -1; }
+  .gallery__wrapper {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    margin-top: clamp(16px, 2vw, 36px);
+    padding: 0 6vw; /* cards start and end on the gutters but still run full-bleed */
+    overflow: hidden;
+    user-select: none;
+  }
+  .gallery__image__container {
+    display: flex;
+    gap: 24px;
+    will-change: transform;
+    height: 100%;
+  }
+  .gallery__item {
+    flex-shrink: 0;
+    width: 55vw;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff; /* the text strip */
+  }
+  .gallery__media {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    position: relative;
+    display: block;
+  }
+  .gallery__media__image {
+    position: absolute;
+    top: 0;
+    left: -12.5%;
+    width: 125%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* White strip: heading on the left, sub-text in a column from ~52% across */
+  .gallery__caption {
+    display: grid;
+    grid-template-columns: 52fr 48fr;
+    column-gap: 20px;
+    align-items: start;
+    padding: clamp(14px, 1.4vw, 24px) clamp(16px, 1.6vw, 28px);
+    color: var(--ink); /* dark text on the white strip, not the section's light text */
+  }
+  .gallery__caption h3 {
+    font-family: "Display", "Impact", sans-serif;
+    font-weight: 400;
+    font-size: clamp(26px, 3.4vw, 64px);
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+  .gallery__caption p {
+    font-size: clamp(15px, 1.35vw, 23px);
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--muted);
+  }
+  /* Tags: bordered boxes on one line under the sub-text */
+  .gallery__tags {
+    list-style: none;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    margin-top: clamp(10px, 1vw, 16px);
+  }
+  .gallery__tags li {
+    flex-shrink: 0;
+    padding: 0.35em 0.7em;
+    border: 1px solid rgba(22, 22, 26, 0.22);
+    border-radius: 999px;
+    font-size: clamp(10px, 0.8vw, 14px);
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  /* ───────── Marquee strip (between the curriculum and the reviews) ─────────
+     The script appends a copy of the items; the track slides left by exactly
+     one copy (-50%), so the loop has no seam. */
+  main > section.marquee { color: #000; } /* no band: same paper background as the sections around it */
+  .marquee {
+    overflow: hidden;
+    padding: clamp(20px, 2.5vw, 40px) 0;
+  }
+  .marquee__track {
+    display: flex;
+    width: max-content;
+    animation: marquee 40s linear infinite;
+  }
+  .marquee__item {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    font-family: "Display", "Impact", sans-serif;
+    font-size: clamp(64px, 11vw, 200px);
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  /* separator after every item (not a gap, so one copy is exactly half) */
+  .marquee__item::after {
+    content: "\2726";
+    margin: 0 0.35em;
+    font-size: 0.45em;
+  }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+
+  /* ───────── 3. On-scroll image columns ───────── */
+  /* Ported from Codrops "On-Scroll Column & Row Animations", demo 2
+     (OnScrollColumnsRows/index2.html + js/index2.js): the middle column
+     glides against the other two as the grid crosses the viewport, and the
+     outer columns' tiles rotate/slide open from their bottom corner as each
+     one scrolls through. Re-implemented in plain JS (no GSAP/ScrollTrigger/
+     Lenis) so it stays dependency-free, and made responsive: 3 columns on
+     desktop, 2 on mobile (third column simply hidden). */
+  .reviews { padding: 96px 0 0; }
+  .oscols {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 10vh 6vw 14vh;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(8px, 1.4vw, 20px);
+    align-items: start;
+  }
+  .oscols__col { display: grid; gap: clamp(8px, 1.4vw, 20px); }
+  .oscols__item { position: relative; z-index: 1; }
+  .oscols__item-tile {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 20px;
+    overflow: hidden;
+    will-change: transform;
+  }
+  .oscols__item-tile--1 { background: radial-gradient(120% 140% at 15% 15%, #ff8a6b 0%, transparent 55%), radial-gradient(100% 120% at 90% 90%, #ffd166 0%, transparent 55%), var(--red); }
+  .oscols__item-tile--2 { background: radial-gradient(120% 140% at 85% 15%, #9a5cd0 0%, transparent 55%), radial-gradient(100% 120% at 10% 90%, #2f2fd0 0%, transparent 55%), var(--purple); }
+  .oscols__item-tile--3 { background: radial-gradient(120% 140% at 15% 85%, #3a3a44 0%, transparent 55%), radial-gradient(100% 120% at 90% 15%, #f0233b 0%, transparent 50%), var(--ink); }
+  .oscols__item-tile--4 { background: radial-gradient(120% 140% at 88% 88%, #ffd166 0%, transparent 55%), radial-gradient(100% 120% at 10% 10%, #f0233b 0%, transparent 55%), #ff6a3d; }
+  .oscols__item-tile--5 { background: radial-gradient(120% 140% at 12% 88%, #7b5cd6 0%, transparent 55%), radial-gradient(100% 120% at 88% 12%, #3aa1e0 0%, transparent 55%), #2f2fd0; }
+  .oscols__item-tile--6 { background: radial-gradient(120% 140% at 80% 20%, #3aa17e 0%, transparent 55%), radial-gradient(100% 120% at 15% 85%, #16161a 0%, transparent 55%), #1e8f63; }
+
+  /* ───────── 4. Enroll CTA ───────── */
+  .enroll { padding: 80px 6vw 32px; }
+  .enroll__panel {
+    background: var(--red);
+    color: #fff;
+    border-radius: 48px;
+    padding: 96px 6vw;
+    text-align: center;
+  }
+  .enroll__panel h2 {
+    font-family: "Display", "Impact", sans-serif;
+    font-weight: 400;
+    font-size: clamp(56px, 10vw, 150px);
+    line-height: 0.9;
+    text-transform: uppercase;
+  }
+  .enroll__panel p { font-size: clamp(17px, 1.6vw, 21px); max-width: 560px; margin: 20px auto 36px; opacity: 0.92; }
+  .enroll__price { display: flex; justify-content: center; align-items: baseline; gap: 14px; margin-bottom: 32px; }
+  .enroll__price strong { font-size: 44px; font-weight: 700; }
+  .enroll__price s { opacity: 0.65; font-size: 20px; }
+  .btn--light { background: #fff; color: var(--red); }
+  .footer {
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    padding: 32px 0 8px;
+    font-size: 14px; color: var(--muted);
+  }
+
+  /* ───────── Responsive ───────── */
+  @media (max-width: 760px) {
+    :root { --radius-xl: 36px; }
+    :root { --nav-h: 64px; --nav-top: 28px; }
+    .nav { width: calc(100% - 32px); } /* the 16px phone margins */
+    .nav__logo img { height: 40px; }
+    .nav__toggle { display: grid; place-items: center; }
+    .nav__links {
+      position: absolute;
+      top: calc(100% + 8px); left: 0; right: 0;
+      flex-direction: column;
+      background: #fff;
+      border-radius: 18px;
+      padding: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      display: none;
+    }
+    .nav.open .nav__links { display: flex; }
+    .hero-wrap { min-height: 0; } /* height from the content on phones */
+    .hero { padding: 48px 16px 24px; }
+    /* badge left, enrolled strip right, both scaled down to share one row */
+    .hero__meta { flex-wrap: nowrap; }
+    .hero__meta img { height: auto; width: 46%; }
+    /* Two lines, each sized to run edge to edge on its own. The h1 takes the
+       last line's size, so its em-based spacing (the rule gap) stays exact. */
+    .hero__title h1 { font-size: calc(100cqi / var(--fit-last, 2.43)); margin-top: 0.17em; }
+    .hero__line { display: block; }
+    .hero__line:first-child { font-size: calc(100cqi / var(--fit-first, 3.03)); }
+    .hero__features { grid-template-columns: repeat(3, 1fr); column-gap: 10px; }
+    .intro { padding: 32px 16px 48px; }
+    .hgallery__pin { --pin-gap: 20px; }
+    .modules__head, .modules__meta { margin: 0 16px; }
+    .gallery__wrapper { padding: 0 16px; }
+    /* wider cards on a phone, capped in height so they don't become tall strips */
+    .gallery__item { width: 82vw; height: min(100%, 140vw); }
+    /* no room for two columns in a phone card: stack, and let the tags wrap */
+    .gallery__caption { grid-template-columns: 1fr; row-gap: 8px; }
+    .gallery__tags { flex-wrap: wrap; }
+    .oscols { grid-template-columns: repeat(2, 1fr); padding: 8vh 16px 10vh; }
+    .oscols__col:nth-child(3) { display: none; }
+    .enroll { padding: 60px 16px 24px; }
+    .enroll__panel { border-radius: 32px; padding: 64px 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .intro__cta svg { transition: none; }
+    .marquee__track { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Floating navbar -->
+<nav class="nav" id="nav">
+  <a href="#home" class="nav__logo" aria-label="Zero to Hero home">
+    <img src="logo.png" alt="Zero to Hero — Discover your true design power" />
+  </a>
+  <button class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">☰</button>
+  <ul class="nav__links">
+    <li><a href="#home">Home</a></li>
+    <li><a href="#modules">Modules</a></li>
+    <li><a href="#reviews">Student review</a></li>
+    <li><a href="#enroll">Enroll</a></li>
+  </ul>
+</nav>
+
+<main>
+  <!-- 1. Hero -->
+  <section class="hero-wrap" id="home">
+    <div class="hero">
+      <div class="hero__meta">
+        <img src="element-1.png" alt="India's most affordable and complete graphic design program" />
+        <img src="element-2.png" alt="5K+ students already enrolled, rated 4.9 from 12K+ reviews" />
+      </div>
+
+      <div class="hero__title">
+        <h1><span class="hero__line">From zero to</span> <span class="hero__line">job-ready</span></h1>
+      </div>
+
+      <ul class="hero__features">
+        <li>Google Classroom assignments</li>
+        <li>Doubt live classes</li>
+        <li>320+ hours lectures</li>
+      </ul>
+
+      <!-- 21:9 video block (hero.mp4 is 1496×642, i.e. 21:9); the poster is its first frame -->
+      <div class="hero__video-wrap">
+        <div class="hero__video">
+          <video src="hero.mp4" poster="hero-poster.webp" autoplay muted loop playsinline preload="auto"></video>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Intro: CTAs + pitch -->
+  <section class="intro">
+    <div class="intro__cta">
+      <a href="#enroll" class="intro__cta-enroll">Enroll now</a>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H4M10 18l-6-6 6-6" /></svg>
+      <a href="#modules">View curriculum</a>
+    </div>
+    <p class="intro__text">More than a design course, a complete system to help you become a designer.<br />Learn, practice, get feedback, improve your skills, and build a portfolio that represents your work.</p>
+  </section>
+
+  <!-- 2. Horizontal parallax gallery -->
+  <section id="modules">
+    <div class="hgallery" id="hgallery">
+      <div class="hgallery__pin" id="hgalleryPin">
+        <header class="modules__head">
+          <h2 class="modules__title">Everything you need<br />to master design.</h2>
+          <span class="modules__label">The curriculum</span>
+        </header>
+        <div class="modules__meta"><span>(1)</span><span>What you'll learn</span></div>
+        <div class="gallery__wrapper">
+          <div class="gallery__image__container" id="galleryContainer">
+            <figure class="gallery__item">
+              <picture class="gallery__media">
+                <img src="gallery/1.webp" alt="" class="gallery__media__image" draggable="false" />
+              </picture>
+              <figcaption class="gallery__caption"><h3>01 — Master the tools</h3><div class="gallery__detail"><p>Industry-standard tools ko fundamentals se advanced level tak master karo.</p><ul class="gallery__tags"><li>Photoshop</li><li>Illustrator</li><li>Premiere Pro</li><li>After Effects</li><li>AI Tools</li></ul></div></figcaption>
+            </figure>
+            <figure class="gallery__item">
+              <picture class="gallery__media">
+                <img src="gallery/2.webp" alt="" class="gallery__media__image" draggable="false" />
+              </picture>
+              <figcaption class="gallery__caption"><h3>02 — Learn by doing</h3><div class="gallery__detail"><p>Sirf tutorials nahi — har week practice, submission, feedback aur improvement.</p><ul class="gallery__tags"><li>Weekly Assignments</li><li>Live Doubt Classes</li><li>Real Projects</li><li>Expert Feedback</li></ul></div></figcaption>
+            </figure>
+            <figure class="gallery__item">
+              <picture class="gallery__media">
+                <img src="gallery/3.webp" alt="" class="gallery__media__image" draggable="false" />
+              </picture>
+              <figcaption class="gallery__caption"><h3>03 — Create with AI</h3><div class="gallery__detail"><p>Modern AI tools ko design workflow mein practically use karna seekho.</p><ul class="gallery__tags"><li>AI Design</li><li>AI Images</li><li>AI Video</li><li>Creative Workflows</li></ul></div></figcaption>
+            </figure>
+            <figure class="gallery__item">
+              <picture class="gallery__media">
+                <img src="gallery/4.webp" alt="" class="gallery__media__image" draggable="false" />
+              </picture>
+              <figcaption class="gallery__caption"><h3>04 — Learn from the industry</h3><div class="gallery__detail"><p>Experienced designers aur creators se directly seekho aur industry ko samjho.</p><ul class="gallery__tags"><li>Live Mentorship</li><li>Guest Sessions</li><li>Industry Experts</li><li>Real Insights</li></ul></div></figcaption>
+            </figure>
+            <figure class="gallery__item">
+              <picture class="gallery__media">
+                <img src="gallery/5.webp" alt="" class="gallery__media__image" draggable="false" />
+              </picture>
+              <figcaption class="gallery__caption"><h3>05 — Build your career</h3><div class="gallery__detail"><p>Design skills ko real-world projects, clients aur freelance opportunities mein convert karna seekho.</p><ul class="gallery__tags"><li>Freelancing</li><li>Client Work</li><li>Portfolio</li><li>Career Guidance</li></ul></div></figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Marquee strip -->
+  <section class="marquee" aria-label="Programme highlights">
+    <div class="marquee__track">
+      <span class="marquee__item">320 Hour Lectures</span>
+      <span class="marquee__item">16 Week Program</span>
+      <span class="marquee__item">15+ Google Classroom Assignments</span>
+      <span class="marquee__item">Lifetime Website Access</span>
+      <span class="marquee__item">Mentors</span>
+    </div>
+  </section>
+
+  <!-- 3. On-scroll image columns -->
+  <section class="reviews" id="reviews">
+    <div class="section-head">
+      <span class="eyebrow">Student review</span>
+      <h2>Real students, real wins</h2>
+    </div>
+
+    <div class="oscols" id="oscols">
+      <div class="oscols__col" data-role="tilt-left">
+        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--1"></div></figure>
+        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--4"></div></figure>
+        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--2"></div></figure>
+        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--5"></div></figure>
+      </div>
+      <div class="oscols__col" data-role="stagger">
+        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--3"></div></figure>
+        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--6"></div></figure>
+        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--4"></div></figure>
+        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--1"></div></figure>
+      </div>
+      <div class="oscols__col" data-role="tilt-right">
+        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--5"></div></figure>
+        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--2"></div></figure>
+        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--6"></div></figure>
+        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--3"></div></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Enroll CTA -->
+  <section class="enroll" id="enroll">
+    <div class="enroll__panel">
+      <span class="eyebrow" style="color:#fff">Limited seats</span>
+      <h2>Become the hero</h2>
+      <p>Join 5,000+ students learning design, building portfolios and getting paid for their creativity.</p>
+      <div class="enroll__price"><strong>₹2,999</strong><s>₹9,999</s></div>
+      <a href="#" class="btn btn--light">Enroll now →</a>
+    </div>
+    <footer class="footer">
+      <span>© 2026 Zero to Hero. All rights reserved.</span>
+      <a href="#home">Back to top ↑</a>
+    </footer>
+  </section>
+</main>
+
+<script>
+  // Mobile menu
+  const nav = document.getElementById('nav');
+  const toggle = document.getElementById('navToggle');
+  toggle.addEventListener('click', () => {
+    const open = nav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open);
+  });
+  nav.querySelectorAll('.nav__links a').forEach(a =>
+    a.addEventListener('click', () => nav.classList.remove('open'))
+  );
+
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = (min, max, v) => Math.min(max, Math.max(min, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  // Runs onFrame on a rAF loop only while `el` is near the viewport, so these
+  // scroll-linked effects stop ticking once their section is off-screen.
+  function runWhileVisible(el, onFrame) {
+    let raf = null;
+    const loop = () => { onFrame(); raf = requestAnimationFrame(loop); };
+    new IntersectionObserver((entries) => {
+      const visible = entries[0].isIntersecting;
+      if (visible && raf === null) loop();
+      if (!visible && raf !== null) { cancelAnimationFrame(raf); raf = null; }
+    }, { rootMargin: '25% 0px' }).observe(el);
+  }
+
+  // ---- Section 2: horizontal parallax gallery ----------------------------
+  // Port of the Codrops demo's App + Gallery classes (src/main.ts and
+  // src/gallery/index.ts, DOM version, no WebGL): scroll { current, target,
+  // ease: 0.07, limit }, lerp every frame, translateX the container, and
+  // counter-shift each image by up to 10% of its width depending on how far
+  // its frame is from the viewport centre.
+  // The one change: the demo is a single-screen page, so it adds wheel deltaY
+  // to the target. Here the target is how far you've scrolled into the pinned
+  // section. That's the same 1px-per-1px mapping, but the rest of the page
+  // still scrolls normally and touch works.
+  (() => {
+    const section = document.getElementById('hgallery');
+    const pin = document.getElementById('hgalleryPin');
+    const container = document.getElementById('galleryContainer');
+    const images = [...container.querySelectorAll('.gallery__media__image')];
+
+    const scroll = { current: 0, target: 0, ease: reduceMotion ? 1 : 0.07, limit: 0 };
+    const maxShift = reduceMotion ? 0 : 10; // %; the 125%-wide image never shows an edge
+
+    function setLimit() {
+      // The container fills the wrapper's content box (inside the gutters), so
+      // the scroll ends with the last card's right edge on the right gutter.
+      scroll.limit = Math.max(0, container.scrollWidth - container.clientWidth);
+      // stay pinned for exactly as much vertical scroll as there is horizontal travel
+      section.style.height = pin.offsetHeight + scroll.limit + 'px';
+    }
+
+    function applyParallaxEffect() {
+      const viewportCenter = window.innerWidth * 0.5;
+      images.forEach((image) => {
+        const rect = image.parentElement.getBoundingClientRect();
+        const t = clamp(-1, 1, (rect.left + rect.width * 0.5 - viewportCenter) / viewportCenter);
+        image.style.transform = `translate3d(${-t * maxShift}%, 0, 0)`;
+      });
+    }
+
+    function render() {
+      // measure the (non-sticky) section, not the pin: a stuck element's top is always 0
+      scroll.target = clamp(0, scroll.limit, -section.getBoundingClientRect().top);
+      scroll.current = lerp(scroll.current, scroll.target, scroll.ease);
+      container.style.transform = `translateX(${scroll.current < 0.01 ? 0 : -scroll.current}px)`;
+      applyParallaxEffect();
+    }
+
+    window.addEventListener('resize', setLimit);
+    setLimit();
+    runWhileVisible(section, render);
+  })();
+
+  // ---- Section 3: on-scroll image columns ---------------------------------
+  // Ported from OnScrollColumnsRows/index2.js (Codrops "On-Scroll Column &
+  // Row Animations", demo 2): the middle column glides against the other two
+  // across the grid's scroll range, and each outer tile rotates/slides open
+  // from its bottom corner as it crosses the viewport. Re-implemented in
+  // plain JS (no GSAP/ScrollTrigger/Lenis) to stay dependency-free. Purely
+  // decorative, so it's skipped entirely under reduced motion.
+  if (!reduceMotion) {
+    (() => {
+      const grid = document.getElementById('oscols');
+      const staggerCol = grid.querySelector('[data-role="stagger"]');
+      const tiltItems = [...grid.querySelectorAll('[data-role="tilt-left"] .oscols__item, [data-role="tilt-right"] .oscols__item')]
+        .map((figure) => ({
+          figure,
+          tile: figure.querySelector('.oscols__item-tile'),
+          side: figure.closest('[data-role="tilt-left"]') ? -1 : 1,
+        }));
+
+      function progressFor(rect, vh) {
+        return clamp(0, 1, (vh - rect.top) / (vh + rect.height));
+      }
+
+      runWhileVisible(grid, () => {
+        const vh = window.innerHeight;
+
+        const gp = progressFor(grid.getBoundingClientRect(), vh);
+        staggerCol.style.transform = `translate3d(0, ${-20 * gp}%, 0)`;
+
+        tiltItems.forEach(({ figure, tile, side }) => {
+          if (figure.offsetParent === null) return; // column hidden at this breakpoint
+          const p = progressFor(figure.getBoundingClientRect(), vh);
+          tile.style.transformOrigin = side < 0 ? '0% 100%' : '100% 100%';
+          tile.style.transform = `rotate(${side * 6 * p}deg) translate3d(${side * 10 * p}%, 0, 0)`;
+        });
+      });
+    })();
+  }
+
+  // Marquee: append a copy of the items so sliding by -50% loops seamlessly
+  (() => {
+    const track = document.querySelector('.marquee__track');
+    [...track.children].forEach((item) => {
+      const copy = item.cloneNode(true);
+      copy.setAttribute('aria-hidden', 'true');
+      track.appendChild(copy);
+    });
+  })();
+
+  // Card strips: every white strip gets the height of the tallest one, so the
+  // strips (and the images above them) line up across all five cards
+  (() => {
+    const strips = [...document.querySelectorAll('.gallery__caption')];
+    const equalize = () => {
+      strips.forEach((s) => (s.style.minHeight = ''));
+      const tallest = Math.max(...strips.map((s) => s.getBoundingClientRect().height));
+      strips.forEach((s) => (s.style.minHeight = tallest + 'px'));
+    };
+    equalize();
+    document.fonts.ready.then(equalize);
+    window.addEventListener('resize', equalize);
+  })();
+
+  // Hero video: plays muted on loop only while it's on screen. With reduced
+  // motion it never plays; it's reset to show the poster frame instead.
+  (() => {
+    const video = document.querySelector('.hero__video video');
+    if (reduceMotion) {
+      video.removeAttribute('autoplay');
+      video.preload = 'none';
+      video.load(); // reset to the poster
+      return;
+    }
+    new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) video.play().catch(() => {});
+      else video.pause();
+    }).observe(video);
+  })();
+
+  // Hero heading: once its font has loaded, measure how many ems wide the text
+  // is (the whole line for desktop; each line alone for the two-line phone
+  // layout) and hand that to the CSS, so it stays edge to edge whatever the copy.
+  (() => {
+    const h1 = document.querySelector('.hero__title h1');
+    const [first, last] = h1.querySelectorAll('.hero__line');
+    const fit = () => {
+      const texts = [h1.textContent, first.textContent, last.textContent];
+      // a hidden copy at 100px, so the width in px / 100 = the width in ems
+      const probe = document.createElement('span');
+      probe.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font-size:100px;letter-spacing:-0.01em';
+      h1.appendChild(probe);
+      const [whole, one, two] = texts.map((text) => {
+        probe.textContent = text.replace(/\s+/g, ' ').trim();
+        return probe.getBoundingClientRect().width / 100;
+      });
+      probe.remove();
+      h1.style.setProperty('--fit', whole);
+      h1.style.setProperty('--fit-first', one);
+      h1.style.setProperty('--fit-last', two);
+    };
+    document.fonts.load('1em Display').then(fit, fit);
+  })();
+
+  // Active nav link
+  const links = [...document.querySelectorAll('.nav__links a')];
+  const sections = links.map(l => document.querySelector(l.getAttribute('href')));
+  function updateActive() {
+    const y = window.innerHeight * 0.4;
+    let current = sections[0];
+    sections.forEach(s => { if (s.getBoundingClientRect().top <= y) current = s; });
+    links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + current.id));
+  }
+
+  window.addEventListener('scroll', updateActive, { passive: true });
+  updateActive();
+</script>
+</body>
+</html>
