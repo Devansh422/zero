@@ -73,6 +73,9 @@
   }
   .nav__links a:hover { background: #f3f3f3; }
   .nav__links a.active { background: var(--red); color: #fff; }
+  /* slid up out of view while the horizontal scroll section is pinned */
+  .nav { transition: transform 0.4s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.3s; }
+  .nav--hidden { transform: translate(-50%, calc(-100% - var(--nav-top) - 12px)); opacity: 0; pointer-events: none; }
   .nav__toggle {
     display: none;
     width: 44px; height: 44px;
@@ -267,9 +270,9 @@
     position: sticky;
     top: 0;
     height: 100vh;
-    /* the same gap under the floating nav as under the cards */
+    /* the same gap above the title as under the cards */
     --pin-gap: clamp(24px, 3vw, 48px);
-    padding: calc(var(--nav-top) + var(--nav-h) + var(--pin-gap)) 0 var(--pin-gap);
+    padding: var(--pin-gap) 0; /* the nav is hidden while this is pinned */
     display: flex;
     flex-direction: column;
   }
@@ -414,6 +417,55 @@
   }
   @keyframes marquee { to { transform: translateX(-50%); } }
 
+  /* ───────── Showcase: one big image that settles into a grid on scroll ─────────
+     A tall scroller with a pinned, full-screen stage. The grid below is laid
+     out at its final positions; the script scales the centre image up from its
+     cell and pulls the other 12 in from behind it as you scroll. */
+  .showcase__scroll { position: relative; height: 320vh; }
+  .showcase__stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    /* top: clear the floating nav */
+    padding: calc(var(--nav-top) + var(--nav-h) + clamp(20px, 4vh, 48px)) 6vw clamp(24px, 5vh, 64px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(20px, 4vh, 48px);
+    overflow: hidden;
+  }
+  .showcase__head { text-align: center; }
+  .showcase__head .eyebrow { color: var(--red); }
+  .showcase__head h2 {
+    font-family: "Display", "Impact", sans-serif;
+    font-weight: 400;
+    font-size: clamp(56px, 8.5vw, 160px);
+    line-height: 0.9;
+    text-transform: uppercase;
+  }
+  .wgrid {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    align-content: center;
+    gap: clamp(8px, 1.6vw, 28px);
+  }
+  .wgrid__cell { position: relative; aspect-ratio: 16 / 9; }
+  .wgrid__cell:nth-child(6) { grid-column: 2; } /* middle row: columns 2–4 */
+  .wgrid__cell:nth-child(9) { grid-column: 1; }   /* bottom row starts again */
+  .wgrid__cell:nth-child(7) { z-index: 2; }       /* the big centre image */
+  .wgrid__img {
+    position: absolute;
+    inset: 0;
+    border-radius: clamp(8px, 1vw, 18px);
+    overflow: hidden;
+    will-change: transform, opacity;
+  }
+  .wgrid__img img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
   /* ───────── 3. On-scroll image columns ───────── */
   /* Ported from Codrops "On-Scroll Column & Row Animations", demo 2
      (OnScrollColumnsRows/index2.html + js/index2.js): the middle column
@@ -514,6 +566,12 @@
     /* no room for two columns in a phone card: stack, and let the tags wrap */
     .gallery__caption { grid-template-columns: 1fr; row-gap: 8px; }
     .gallery__tags { flex-wrap: wrap; }
+    /* showcase: 3 columns (3 + 3 + 3); the outer columns of the desktop grid drop out */
+    .showcase__scroll { height: 240vh; }
+    .showcase__stage { justify-content: center; } /* heading + grid as one centred group */
+    .wgrid { flex: none; grid-template-columns: repeat(3, 1fr); }
+    .wgrid__cell:nth-child(6) { grid-column: auto; }
+    .wgrid__cell:nth-child(1), .wgrid__cell:nth-child(5), .wgrid__cell:nth-child(9), .wgrid__cell:nth-child(13) { display: none; }
     .oscols { grid-template-columns: repeat(2, 1fr); padding: 8vh 16px 10vh; }
     .oscols__col:nth-child(3) { display: none; }
     .enroll { padding: 60px 16px 24px; }
@@ -593,19 +651,19 @@
           <div class="gallery__image__container" id="galleryContainer">
             <figure class="gallery__item">
               <picture class="gallery__media">
-                <img src="gallery/1.webp" alt="" class="gallery__media__image" draggable="false" />
+                <img src="gallery/card-1.webp" alt="" class="gallery__media__image" draggable="false" />
               </picture>
               <figcaption class="gallery__caption"><h3>01 — Master the tools</h3><div class="gallery__detail"><p>Industry-standard tools ko fundamentals se advanced level tak master karo.</p><ul class="gallery__tags"><li>Photoshop</li><li>Illustrator</li><li>Premiere Pro</li><li>After Effects</li><li>AI Tools</li></ul></div></figcaption>
             </figure>
             <figure class="gallery__item">
               <picture class="gallery__media">
-                <img src="gallery/2.webp" alt="" class="gallery__media__image" draggable="false" />
+                <img src="gallery/card-2.webp" alt="" class="gallery__media__image" draggable="false" />
               </picture>
               <figcaption class="gallery__caption"><h3>02 — Learn by doing</h3><div class="gallery__detail"><p>Sirf tutorials nahi — har week practice, submission, feedback aur improvement.</p><ul class="gallery__tags"><li>Weekly Assignments</li><li>Live Doubt Classes</li><li>Real Projects</li><li>Expert Feedback</li></ul></div></figcaption>
             </figure>
             <figure class="gallery__item">
               <picture class="gallery__media">
-                <img src="gallery/3.webp" alt="" class="gallery__media__image" draggable="false" />
+                <img src="gallery/card-3.webp" alt="" class="gallery__media__image" draggable="false" />
               </picture>
               <figcaption class="gallery__caption"><h3>03 — Create with AI</h3><div class="gallery__detail"><p>Modern AI tools ko design workflow mein practically use karna seekho.</p><ul class="gallery__tags"><li>AI Design</li><li>AI Images</li><li>AI Video</li><li>Creative Workflows</li></ul></div></figcaption>
             </figure>
@@ -613,11 +671,11 @@
               <picture class="gallery__media">
                 <img src="gallery/4.webp" alt="" class="gallery__media__image" draggable="false" />
               </picture>
-              <figcaption class="gallery__caption"><h3>04 — Learn from the industry</h3><div class="gallery__detail"><p>Experienced designers aur creators se directly seekho aur industry ko samjho.</p><ul class="gallery__tags"><li>Live Mentorship</li><li>Guest Sessions</li><li>Industry Experts</li><li>Real Insights</li></ul></div></figcaption>
+              <figcaption class="gallery__caption"><h3>04 — Learn from the industry experts</h3><div class="gallery__detail"><p>Experienced designers aur creators se directly seekho aur industry ko samjho.</p><ul class="gallery__tags"><li>Live Mentorship</li><li>Guest Sessions</li><li>Industry Experts</li><li>Real Insights</li></ul></div></figcaption>
             </figure>
             <figure class="gallery__item">
               <picture class="gallery__media">
-                <img src="gallery/5.webp" alt="" class="gallery__media__image" draggable="false" />
+                <img src="gallery/card-5.webp" alt="" class="gallery__media__image" draggable="false" />
               </picture>
               <figcaption class="gallery__caption"><h3>05 — Build your career</h3><div class="gallery__detail"><p>Design skills ko real-world projects, clients aur freelance opportunities mein convert karna seekho.</p><ul class="gallery__tags"><li>Freelancing</li><li>Client Work</li><li>Portfolio</li><li>Career Guidance</li></ul></div></figcaption>
             </figure>
@@ -635,6 +693,33 @@
       <span class="marquee__item">15+ Google Classroom Assignments</span>
       <span class="marquee__item">Lifetime Website Access</span>
       <span class="marquee__item">Mentors</span>
+    </div>
+  </section>
+
+  <!-- Showcase: big image settles into a grid on scroll -->
+  <section id="showcase">
+    <div class="showcase__scroll" id="showcaseScroll">
+      <div class="showcase__stage">
+        <div class="showcase__head">
+          <span class="eyebrow">Student showcase</span>
+          <h2>Work that speaks for itself</h2>
+        </div>
+        <div class="wgrid" id="wgrid">
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/1.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/6.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/4.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/7.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/5.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/9.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/3.webp" alt="" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/10.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/8.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/2.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="hero-poster.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/6.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/1.webp" alt="" loading="lazy" /></div></div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -808,6 +893,58 @@
     });
   })();
 
+  // Showcase: scroll progress through the tall scroller drives the grid. The
+  // centre image starts big (centred in the grid area) and scales down into its
+  // cell; the other images start tucked behind it, small and transparent, and
+  // move out to their cells in order of distance from the centre.
+  (() => {
+    const scroller = document.getElementById('showcaseScroll');
+    const grid = document.getElementById('wgrid');
+    const cells = [...grid.children];
+    const centre = cells[6];
+    const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const mid = (r) => [r.left + r.width / 2, r.top + r.height / 2];
+
+    function render() {
+      const s = scroller.getBoundingClientRect();
+      const p = clamp(0, 1, -s.top / (scroller.offsetHeight - window.innerHeight));
+      const e = reduceMotion ? 1 : ease(clamp(0, 1, p / 0.85)); // settled for the last 15%
+
+      const area = grid.getBoundingClientRect();
+      const c = centre.getBoundingClientRect();
+      const [cx, cy] = mid(c), [ax, ay] = mid(area);
+      // big state: as large as the grid area allows at 16:9 (up to 62% of its
+      // width, 92% on phones). The image is laid out at that big size and scaled *down* into
+      // its cell, so it stays sharp (scaling the small cell up would blur it).
+      const bigW = Math.min(area.width * (area.width < 600 ? 0.92 : 0.62), area.height * (16 / 9));
+      const bigH = bigW * (9 / 16);
+      const img = centre.firstElementChild;
+      img.style.inset = 'auto';
+      img.style.width = bigW + 'px';
+      img.style.height = bigH + 'px';
+      img.style.left = (c.width - bigW) / 2 + 'px';
+      img.style.top = (c.height - bigH) / 2 + 'px';
+      img.style.borderRadius = `calc(${clamp(8, 18, window.innerWidth * 0.01)}px / ${lerp(1, c.width / bigW, e)})`; // keeps the corner radius constant on screen
+      img.style.transform =
+        `translate3d(${lerp(ax - cx, 0, e)}px, ${lerp(ay - cy, 0, e)}px, 0) scale(${lerp(1, c.width / bigW, e)})`;
+
+      const far = Math.hypot(area.width, area.height) / 2;
+      cells.forEach((cell) => {
+        if (cell === centre || cell.offsetParent === null) return; // skip the centre and cells hidden on phones
+        const [x, y] = mid(cell.getBoundingClientRect());
+        const d = Math.hypot(x - cx, y - cy) / far;             // 0 near the centre … ~1 at the corners
+        const t = ease(clamp(0, 1, (e - 0.1 - d * 0.25) / 0.55)); // nearer ones arrive first
+        const img = cell.firstElementChild;
+        img.style.transform =
+          `translate3d(${(cx - x) * 0.6 * (1 - t)}px, ${(cy - y) * 0.6 * (1 - t)}px, 0) scale(${lerp(0.7, 1, t)})`;
+        img.style.opacity = t;
+      });
+    }
+
+    if (reduceMotion) { render(); return; }
+    runWhileVisible(scroller, render);
+  })();
+
   // Card strips: every white strip gets the height of the tallest one, so the
   // strips (and the images above them) line up across all five cards
   (() => {
@@ -872,8 +1009,16 @@
     links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + current.id));
   }
 
-  window.addEventListener('scroll', updateActive, { passive: true });
+  // Hide the nav while the horizontal scroll section fills the screen
+  const hgallery = document.getElementById('hgallery');
+  function updateNav() {
+    const r = hgallery.getBoundingClientRect();
+    nav.classList.toggle('nav--hidden', r.top <= 1 && r.bottom >= window.innerHeight - 1);
+  }
+
+  window.addEventListener('scroll', () => { updateActive(); updateNav(); }, { passive: true });
   updateActive();
+  updateNav();
 </script>
 </body>
 </html>
