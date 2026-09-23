@@ -426,6 +426,7 @@
     content: "\2726";
     margin: 0 0.35em;
     font-size: 0.45em;
+    color: #fa3458; /* brand pink, where the hero gradient starts */
   }
   @keyframes marquee { to { transform: translateX(-50%); } }
 
@@ -482,25 +483,26 @@
 
   /* ───────── Commitment ─────────
      Left: a lead line in the body font, then the big gradient heading. Right:
-     the paragraph and an Enroll button, sitting level with the heading's foot. */
+     the paragraph (all the remaining width) and an Enroll button, level with
+     the heading's foot. */
   .commit { padding: clamp(64px, 8vw, 140px) 6vw; }
   .commit__inner {
     display: grid;
-    grid-template-columns: auto minmax(0, 36em);
-    justify-content: space-between;
+    /* heading at its own width; the paragraph takes all the rest */
+    grid-template-columns: auto minmax(0, 1fr);
     align-items: end;
-    gap: 24px clamp(32px, 5vw, 96px);
+    gap: 24px clamp(24px, 3.5vw, 64px);
     /* lines above and below: the same 3px rule as the section headers */
     border-top: 3px solid currentColor;
     border-bottom: 3px solid currentColor;
     padding: clamp(40px, 5vw, 88px) 0;
   }
   .commit__lead {
-    max-width: 22em;
+    max-width: 24em;
     margin-bottom: clamp(8px, 1vw, 16px);
-    font-size: clamp(16px, 1.5vw, 26px);
-    font-weight: 600;
-    line-height: 1.25;
+    font-size: clamp(19px, 2vw, 34px);
+    font-weight: 700;
+    line-height: 1.2;
     color: var(--muted);
   }
   .commit__title {
@@ -516,7 +518,10 @@
     background-clip: text;
     color: transparent;
   }
+  /* the paragraph + button sit against the right-hand margin */
+  .commit__side { justify-self: end; }
   .commit__text {
+    max-width: 22em; /* a narrow measure beside the heading */
     font-size: clamp(17px, 1.7vw, 28px);
     font-weight: 500;
     line-height: 1.4;
@@ -773,11 +778,11 @@
   <section class="commit">
     <div class="commit__inner">
       <div>
-        <p class="commit__lead">We’re Not Just Teaching You Graphic Design. We’re Building Your Career.</p>
+        <p class="commit__lead">We’re Not Just Teaching You Graphic Design.<br />We’re Building Your Career.</p>
         <h2 class="commit__title">Ready for<br />commitment?</h2>
       </div>
-      <div>
-        <p class="commit__text">This 16-week program is built to make you industry-ready. Complete the assignments, apply what you learn, and build your skills through real projects. Every assignment becomes a part of your final portfolio so you don’t just learn, you build the work that can get you hired.</p>
+      <div class="commit__side">
+        <p class="commit__text">This 16-week program is built to make you industry-ready. Complete the assignments, build real projects, and turn every assignment into a portfolio piece that helps you get hired.</p>
         <a href="#enroll" class="commit__btn">Enroll now</a>
       </div>
     </div>
