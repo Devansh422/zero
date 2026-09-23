@@ -530,18 +530,279 @@
   .commit__btn {
     display: inline-block;
     margin-top: clamp(16px, 1.6vw, 28px);
-    padding: 0.45em 1em 0.4em;
+    padding: 0.7em 1.3em;
     border-radius: 14px;
     background: var(--brand-gradient);
     color: #fff;
-    font-family: "Display", "Impact", sans-serif;
-    font-size: clamp(22px, 2vw, 34px);
+    font-size: clamp(17px, 1.4vw, 24px); /* the body font, like the paragraph above */
+    font-weight: 600;
     line-height: 1;
-    text-transform: uppercase;
     box-shadow: 0 10px 30px rgba(250, 52, 88, 0.3);
     transition: transform 0.2s, box-shadow 0.2s;
   }
   .commit__btn:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(250, 52, 88, 0.4); }
+
+  /* ───────── Reviews ─────────
+     The showcase header (title left, paragraph right, rule, meta row), then
+     one full-width row: feedback cards flowing in columns on the left, a tall
+     portrait video card against the right-hand margin. */
+  .reviews { padding: clamp(24px, 3vw, 48px) 6vw clamp(64px, 8vw, 140px); }
+  .reviews .modules__head,
+  .reviews .modules__meta { margin: 0; }
+  .reviews__body {
+    margin-top: clamp(24px, 3vw, 56px);
+    display: grid;
+    /* the video column: 27vw, but no taller than the screen allows at 9:16 */
+    grid-template-columns: minmax(0, 1fr) clamp(260px, min(27vw, (100vh - 300px) * 0.5625 + 32px), 520px);
+    gap: clamp(12px, 1.4vw, 24px);
+    align-items: start;
+  }
+  /* masonry: cards of different lengths pack into as many columns as fit */
+  .reviews__quotes { columns: 3 clamp(230px, 17vw, 380px); column-gap: clamp(12px, 1.4vw, 24px); }
+  .quote {
+    break-inside: avoid;
+    margin-bottom: clamp(12px, 1.4vw, 24px);
+    padding: clamp(20px, 2vw, 34px);
+    border-radius: clamp(18px, 1.6vw, 28px);
+    background: #fff;
+    border: 1px solid rgba(22, 22, 26, 0.08);
+  }
+  .quote::before { /* a gradient opening quote mark */
+    content: "“";
+    display: block;
+    height: 0.5em;
+    font-family: "Display", "Impact", sans-serif;
+    font-size: clamp(48px, 4vw, 80px);
+    line-height: 1;
+    background: var(--brand-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .quote p {
+    font-size: clamp(16px, 1.15vw, 21px);
+    font-weight: 500;
+    line-height: 1.45;
+  }
+  .quote p + p { margin-top: 0.6em; } /* separate messages from the same student */
+  .person { display: flex; align-items: center; gap: 12px; margin-top: clamp(16px, 1.4vw, 24px); }
+  .person__avatar {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: clamp(40px, 3vw, 52px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--brand-gradient);
+    color: #fff;
+    font-weight: 700;
+    font-size: clamp(14px, 1vw, 18px);
+  }
+  .person__name { display: block; font-weight: 700; font-size: clamp(15px, 1.05vw, 19px); }
+  .person__role { display: block; font-size: clamp(13px, 0.9vw, 16px); color: var(--muted); }
+  /* the video card: 9:16, held in view (below the nav) while the quotes scroll past */
+  .vcard {
+    position: sticky;
+    top: calc(var(--nav-top) + var(--nav-h) + 16px);
+    padding: clamp(10px, 0.9vw, 16px);
+    border-radius: clamp(20px, 1.8vw, 32px);
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .vcard__media {
+    position: relative;
+    aspect-ratio: 9 / 16;
+    border-radius: clamp(12px, 1.2vw, 22px);
+    overflow: hidden;
+    background: #000;
+  }
+  .vcard__media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .vcard__play {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: clamp(64px, 5vw, 92px);
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    border: 0;
+    border-radius: 50%;
+    background: var(--brand-gradient);
+    box-shadow: 0 12px 36px rgba(250, 52, 88, 0.45);
+    cursor: pointer;
+    transition: scale 0.2s, opacity 0.2s;
+  }
+  .vcard__play::after { /* the triangle */
+    content: "";
+    position: absolute;
+    left: 54%; top: 50%;
+    translate: -50% -50%;
+    border-style: solid;
+    border-width: 0.6em 0 0.6em 1em;
+    border-color: transparent transparent transparent #fff;
+    font-size: clamp(14px, 1.1vw, 20px);
+  }
+  .vcard__play:hover { scale: 1.08; }
+  .vcard.playing .vcard__play { opacity: 0; pointer-events: none; }
+  .vcard .person { margin: clamp(12px, 1vw, 18px) 4px 4px; }
+  .vcard .person__role { color: rgba(247, 239, 237, 0.65); }
+  /* cards rise in as they scroll into view */
+  .reviews .reveal { opacity: 0; translate: 0 40px; transition: opacity 0.7s ease, translate 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .reviews .reveal.in { opacity: 1; translate: 0 0; }
+
+  /* ───────── Student projects: two endless image rows ─────────
+     Both rows run the same way, the top one faster; the script clones each
+     row's images and sets its duration from its length, so sliding by -50%
+     loops seamlessly at a fixed speed. Purely decorative: no hover, no clicks.
+     Rows on desktop; on phones they turn into two columns running upwards. */
+  .pslider {
+    margin: clamp(24px, 3vw, 56px) -6vw 0; /* out to the screen edges */
+    display: grid;
+    gap: clamp(10px, 1vw, 18px);
+    align-items: start; /* each track keeps its own length, so -50% is one copy */
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+  }
+  .pslider__track {
+    display: flex;
+    width: max-content;
+    animation: pslide-x var(--dur, 40s) linear infinite;
+  }
+  .pslider__track img {
+    display: block;
+    flex: none;
+    height: clamp(170px, 15vw, 300px);
+    width: auto;
+    /* a margin, not a gap, so one copy is exactly half the track */
+    margin-right: clamp(10px, 1vw, 18px);
+    border-radius: clamp(10px, 1vw, 18px);
+    object-fit: cover;
+  }
+  /* ───────── Quote ───────── */
+  /* quote on the left, name on the right level with its last line, between
+     the same 3px rules as the commitment section */
+  .quote-block { padding: clamp(48px, 7vw, 130px) 6vw; }
+  .quote-block figure {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 20px clamp(24px, 3.5vw, 64px);
+    border-top: 3px solid currentColor;
+    border-bottom: 3px solid currentColor;
+    padding: clamp(40px, 5vw, 88px) 0;
+  }
+  .quote-block__text {
+    max-width: 13em;
+    width: fit-content; /* the gradient runs across the text, not the empty space */
+    font-family: "Display", "Impact", sans-serif;
+    font-weight: 400;
+    font-size: clamp(46px, 7.2vw, 144px);
+    text-wrap: balance; /* even lines, no lone "A" at a line end */
+    line-height: 0.95;
+    text-transform: uppercase;
+    /* the hero heading's gradient; the padding keeps the glyphs inside the painted area */
+    padding: 0.06em 0;
+    background: var(--brand-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .quote-block__by {
+    padding-bottom: 0.2em; /* level with the quote's baseline */
+    white-space: nowrap;
+    font-size: clamp(17px, 1.5vw, 26px);
+    font-weight: 600;
+  }
+  .quote-block__by span { font-weight: 500; color: var(--muted); }
+  /* ───────── Mentor: one dark card across the page, text left, photo right ───────── */
+  .mentor { padding: 0 6vw clamp(48px, 7vw, 130px); }
+  .mentor__card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    border-radius: clamp(24px, 3vw, 56px);
+    overflow: hidden;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .mentor__body {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(28px, 4.5vw, 88px);
+  }
+  .mentor__meta { font-size: clamp(15px, 1.3vw, 24px); font-weight: 600; opacity: 0.7; }
+  .mentor__name {
+    margin-top: clamp(10px, 1vw, 18px);
+    width: fit-content;
+    font-family: "Display", "Impact", sans-serif;
+    font-weight: 400;
+    font-size: clamp(56px, 8vw, 160px);
+    line-height: 0.9;
+    text-transform: uppercase;
+    padding: 0.06em 0;
+    background: var(--brand-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* the three numbers from the bio, between thin rules */
+  .mentor__stats {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    justify-content: start;
+    list-style: none;
+    gap: 12px clamp(24px, 3.5vw, 64px);
+    margin: clamp(20px, 2.4vw, 44px) 0;
+    padding: clamp(14px, 1.4vw, 24px) 0;
+    border-top: 1px solid rgba(247, 239, 237, 0.2);
+    border-bottom: 1px solid rgba(247, 239, 237, 0.2);
+  }
+  .mentor__stats strong {
+    display: block;
+    font-family: "Display", "Impact", sans-serif;
+    font-weight: 400;
+    font-size: clamp(30px, 3vw, 58px);
+    line-height: 1;
+  }
+  .mentor__stats span { font-size: clamp(13px, 0.95vw, 17px); opacity: 0.65; }
+  .mentor__bio p {
+    max-width: 36em;
+    font-size: clamp(16px, 1.25vw, 22px);
+    line-height: 1.5;
+    color: rgba(247, 239, 237, 0.8);
+  }
+  .mentor__bio p + p { margin-top: 1em; }
+  .mentor__tagline {
+    margin-top: auto; /* down to the card's foot */
+    padding-top: clamp(24px, 2.6vw, 48px);
+    width: fit-content;
+    font-size: clamp(18px, 1.6vw, 30px);
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1.3;
+    background: var(--brand-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* the photo fills the right side; until mentor.webp exists, a gradient panel shows */
+  .mentor__photo {
+    position: relative;
+    min-height: clamp(420px, 44vw, 860px);
+    background: var(--brand-gradient);
+  }
+  .mentor__photo::before {
+    content: "Mentor photo";
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: "Display", "Impact", sans-serif;
+    font-size: clamp(28px, 3vw, 56px);
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+  }
+  .mentor__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  @keyframes pslide-x { to { transform: translateX(-50%); } }
+  @keyframes pslide-y { to { transform: translateY(-50%); } }
 
   /* ───────── 4. Enroll CTA ───────── */
   .enroll { padding: 80px 6vw 32px; }
@@ -617,6 +878,23 @@
     .marquee__rule { margin-left: 16px; margin-right: 16px; }
     .commit__inner { grid-template-columns: 1fr; }
     .commit__title { font-size: clamp(56px, 22vw, 120px); }
+    /* reviews: video first, then the cards in one column */
+    .reviews { padding: 24px 16px 56px; }
+    .reviews__body { grid-template-columns: 1fr; }
+    .reviews__quotes { columns: 1; }
+    .quote-block { padding: 48px 16px; }
+    .quote-block figure { grid-template-columns: 1fr; }
+    /* mentor: photo on top, then the text */
+    .mentor { padding: 0 16px 48px; }
+    .mentor__card { grid-template-columns: 1fr; }
+    .mentor__photo { order: -1; min-height: 0; aspect-ratio: 4 / 5; }
+    .mentor__stats { grid-template-columns: auto auto; gap: 14px 28px; }
+    .mentor__stats li:last-child { grid-column: 1 / -1; } /* the brands get a row of their own */
+    /* projects: two columns side by side, running upwards */
+    .pslider { margin: 24px -16px 0; height: 150vw; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .pslider__track { width: auto; flex-direction: column; animation-name: pslide-y; }
+    .pslider__track img { width: 100%; height: auto; margin: 0 0 10px; }
+    .vcard { position: static; order: -1; width: min(100%, 360px); justify-self: center; }
     .wgrid { flex: none; grid-template-columns: repeat(3, 1fr); }
     .wgrid__cell { aspect-ratio: 3 / 4; } /* portrait tiles on phones */
     .wgrid__cell:nth-child(6) { grid-column: auto; }
@@ -628,6 +906,8 @@
     html { scroll-behavior: auto; }
     .intro__cta svg { transition: none; }
     .marquee__track { animation: none; }
+    .reviews .reveal { opacity: 1; translate: none; transition: none; }
+    .pslider__track { animation: none; }
   }
 </style>
 </head>
@@ -642,7 +922,7 @@
   <ul class="nav__links">
     <li><a href="#home">Home</a></li>
     <li><a href="#modules">Modules</a></li>
-    <li><a href="#showcase">Student review</a></li>
+    <li><a href="#reviews">Student review</a></li>
     <li><a href="#enroll">Enroll</a></li>
   </ul>
 </nav>
@@ -753,7 +1033,7 @@
             <h2 class="modules__title">Work that speaks<br />for itself</h2>
             <p class="showcase__lead">What you see here is exactly what you’ll learn to create in my classes from high-impact brand campaigns and print ads to the kind of work leading brands are creating in the industry today.</p>
           </header>
-          <div class="modules__meta"><span>(2)</span><span>Student work</span></div>
+          <div class="modules__meta"><span>(2)</span><span>Clients Work</span></div>
         </div>
         <div class="wgrid" id="wgrid">
           <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/work-01.webp" alt="" loading="lazy" /></div></div>
@@ -784,6 +1064,134 @@
       <div class="commit__side">
         <p class="commit__text">This 16-week program is built to make you industry-ready. Complete the assignments, build real projects, and turn every assignment into a portfolio piece that helps you get hired.</p>
         <a href="#enroll" class="commit__btn">Enroll now</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews: feedback cards on the left, a video testimonial on the right -->
+  <section class="reviews" id="reviews">
+    <header class="modules__head">
+      <h2 class="modules__title">Apparently, We Changed More<br />Than Just Their Design Skills.</h2>
+      <p class="showcase__lead">Real students. Real struggles. Real transformations. See what our students have to say about their Zero to Hero journey.</p>
+    </header>
+    <div class="modules__meta"><span>(3)</span><span>Student reviews</span></div>
+
+    <div class="reviews__body">
+      <!-- the students' messages exactly as sent (WhatsApp / Instagram screenshots) -->
+      <div class="reviews__quotes">
+        <figure class="quote reveal">
+          <p>Sir abhi toh mene 4 module dekhe or pahla interview diya selection ho gya jb interview de rha tha apki baato ko yaad kiya or jo apne first class mai bataya kese industry mai sab kuch hota hai usko dhyan mai rakha bahut bahut dhanyabad sir jiii life set kar di apne Good work you are doing for us🎊✨🙏</p>
+          <figcaption class="person"><span class="person__avatar">AM</span><span><span class="person__name">Akshay Malviya</span><span class="person__role">Got an offer letter</span></span></figcaption>
+        </figure>
+        <figure class="quote reveal">
+          <p>Bhai just I want to thank you ❤️ ,becz mai freelancing toh karta tha but mai itna confidence kavi feel nhi kar pata tha ki , kya mai client se jo bhi baate rakh raha hu, ya kar raha hu, kya wo sahi bhi kar raha hu, but aapke courses se mujhe clearity mil rahi hai ,still continuing, aur maine client close bhi kiya and last 1 week mai maine ye extra income bhi generate Kiya ,job k sath. Daily do teen ghante de ke,</p>
+          <p>Thankyou once again bhai❤️🙌</p>
+          <figcaption class="person"><span class="person__avatar">KV</span><span><span class="person__name">Karan Verma</span><span class="person__role">Freelancer</span></span></figcaption>
+        </figure>
+        <figure class="quote reveal">
+          <p>Bhaiya dimag khul gaya like blast 💥 hota hain na esa kuch huaa Thank you so much for creating this type of course jahaaa pardhai nahii zindgi jan ne ko milti hain *lok ki dukan band ho jayegi * Ye batttt bhaiyaa... dil ko chui gayi</p>
+          <figcaption class="person"><span class="person__avatar">RS</span><span><span class="person__name">Ronak Sharma</span><span class="person__role">Student</span></span></figcaption>
+        </figure>
+        <figure class="quote reveal">
+          <p>vibhu bhai mera name rashmi me hai mene 3 month job ki hai agency me abhi college ke first year me hu jitna mene job , internet videos or courses me nai sikha utna apki 2 course me 2 month me sikha Pehle ai se kam karne me both difficulty lagti thi prr apke course ki vajah se both help hui</p>
+          <p>design &amp; industry ki depth me itni knowledge koi course me nai hai</p>
+          <p>and video editing cgi to kahi bhi nai hai sir</p>
+          <p>bss ab thode time me apne jo tricks bataye use freelancing start karna hai or pura bharosa hai ke successful honge</p>
+          <figcaption class="person"><span class="person__avatar">R</span><span><span class="person__name">Rashmi</span><span class="person__role">Agency designer · college first year</span></span></figcaption>
+        </figure>
+        <figure class="quote reveal">
+          <p>bhai mena ek or client close kra kl 4000 aya uss sa maza aa rha ha sir bada ap ka class dek dek ka smjh aa rha ha ki client sa kis type sa baat krni hoti ha hme tki wo hme jada pesa do or kl ek client aya uska buget jda ni th but fr bi mena uss sa post ka 1000 la liya just usko chiza smjha ka ki haam ky ky krega apka liya jesa apna bola tha ki apna idea btao client ko wo pesa jada dega</p>
+          <figcaption class="person"><span class="person__avatar">ZH</span><span><span class="person__name">Zero to Hero student</span><span class="person__role">Freelancer</span></span></figcaption>
+        </figure>
+        <figure class="quote reveal">
+          <p>Sir mindset sach mai change hogya arena mai 40000 diye 1000 ka bhi nhi padhaya esa lagta hai ek video mai pura dimag designer jesa lag rha hai bahut bahut dhanyabad apka 2 saal pahle mil gye hote toh mera aaj ka din ho alag hota ab bas plan A rahega only be a good designer........🙏🙌</p>
+          <figcaption class="person"><span class="person__avatar">AM</span><span><span class="person__name">Akshay Malviya</span><span class="person__role">Student</span></span></figcaption>
+        </figure>
+        <figure class="quote reveal">
+          <p>Hii vibhu sir mai daily aapki classes le rahu hu and har class mai kuch na kuch new sikhne ko milta hai mtlb seriously mene socha ni tha koi ase bhi sikha sakta hai mtlb mene seriously itne courses buy kiye but this one is different</p>
+          <figcaption class="person"><span class="person__avatar">ST</span><span><span class="person__name">Shourabh Tomar</span><span class="person__role">Student · working full-time</span></span></figcaption>
+        </figure>
+        <figure class="quote reveal">
+          <p>Bhai mazaa aa gaya, bohot kuch naya sikhne ko mila – seriously, class dekh ke motivation mil gaya! Bas ek chhoti si request thi jab aap board pe likh rahe the, thoda clearly nahi dikh raha tha. Agar aap recording ke time thoda bada screen use karein ya zoom in karein, toh aur bhi better samajh mein aayega. Shukriya bhai, aap kamaal ka sikha rahe ho!</p>
+          <p>Bhai kaab raat khatam ho gya pata nehi chala 🤣</p>
+          <figcaption class="person"><span class="person__avatar">ZH</span><span><span class="person__name">Zero to Hero student</span><span class="person__role">Live class</span></span></figcaption>
+        </figure>
+      </div>
+
+      <figure class="vcard reveal" id="reviewVideo">
+        <div class="vcard__media">
+          <video src="testimonial.mp4" poster="testimonial-poster.webp" preload="none" playsinline></video>
+          <button class="vcard__play" type="button" aria-label="Play video testimonial"></button>
+        </div>
+        <figcaption class="person"><span class="person__avatar">ZH</span><span><span class="person__name">Student story</span><span class="person__role">Video testimonial</span></span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Student projects: same header as the reviews above, then two endless
+       image rows. PLACEHOLDER images (the client work) until the student
+       projects are added. data-speed is in px per second. -->
+  <section class="reviews projects" id="projects">
+    <header class="modules__head">
+      <h2 class="modules__title">Designs that went from “just an<br />assignment” to 🔥</h2>
+      <p class="showcase__lead">Real projects. Real skills. Built by our students.</p>
+    </header>
+    <div class="modules__meta"><span>(4)</span><span>Student projects</span></div>
+
+    <div class="pslider" aria-hidden="true">
+      <div class="pslider__track" data-speed="110">
+        <img src="gallery/work-01.webp" alt="" decoding="async" />
+        <img src="gallery/card-1.webp" alt="" decoding="async" />
+        <img src="gallery/work-avia.webp" alt="" decoding="async" />
+        <img src="gallery/work-03.webp" alt="" decoding="async" />
+        <img src="gallery/card-2.webp" alt="" decoding="async" />
+        <img src="gallery/work-04.webp" alt="" decoding="async" />
+        <img src="gallery/work-05.webp" alt="" decoding="async" />
+        <img src="gallery/card-3.webp" alt="" decoding="async" />
+        <img src="gallery/work-06.webp" alt="" decoding="async" />
+      </div>
+      <div class="pslider__track" data-speed="60">
+        <img src="gallery/work-07.webp" alt="" decoding="async" />
+        <img src="gallery/card-4.webp" alt="" decoding="async" />
+        <img src="gallery/work-08.webp" alt="" decoding="async" />
+        <img src="gallery/work-09.webp" alt="" decoding="async" />
+        <img src="gallery/card-5.webp" alt="" decoding="async" />
+        <img src="gallery/work-10.webp" alt="" decoding="async" />
+        <img src="gallery/work-11.webp" alt="" decoding="async" />
+        <img src="gallery/work-page-2.webp" alt="" decoding="async" />
+        <img src="gallery/work-13.webp" alt="" decoding="async" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Quote -->
+  <section class="quote-block">
+    <figure>
+      <blockquote class="quote-block__text">“A good design isn’t the one you like. A good idea is the one that solves the client’s problem.”</blockquote>
+      <figcaption class="quote-block__by">— Vibhu Trivedi, <span>Designer</span></figcaption>
+    </figure>
+  </section>
+
+  <!-- Mentor: bio card. Drop the photo in as mentor.webp; until then the
+       gradient placeholder shows. -->
+  <section class="mentor" id="mentor">
+    <div class="mentor__card">
+      <div class="mentor__body">
+        <p class="mentor__meta">(5) Meet your mentor</p>
+        <h2 class="mentor__name">Vibhu Trivedi</h2>
+        <ul class="mentor__stats" role="list">
+          <li><strong>10+</strong><span>Years in design</span></li>
+          <li><strong>100K+</strong><span>Instagram community</span></li>
+          <li><strong>Nikon · Whirlpool</strong><span>Brands worked with</span></li>
+        </ul>
+        <div class="mentor__bio">
+          <p>With 10+ years of experience in the design industry, Vibhu Trivedi has worked with leading brands like Nikon and Whirlpool, creating high-impact visual communication across campaigns and digital platforms.</p>
+          <p>A practicing designer and educator, he has helped thousands of aspiring designers build stronger creative thinking, industry-ready skills, and professional portfolios. With a growing community of 100K+ followers on Instagram, his work and design education continue to reach designers across India.</p>
+        </div>
+        <p class="mentor__tagline">Learn from real industry experience. Create with purpose. Design like a professional.</p>
+      </div>
+      <div class="mentor__photo">
+        <img src="mentor.webp" alt="Vibhu Trivedi" onerror="this.remove()" />
       </div>
     </div>
   </section>
@@ -890,6 +1298,23 @@
       copy.setAttribute('aria-hidden', 'true');
       track.appendChild(copy);
     });
+  })();
+
+  // Student projects slider: clone each row so -50% loops seamlessly, and set
+  // its duration from its length so every row moves at its data-speed (px/s):
+  // along the width in rows (desktop), along the height in columns (phones).
+  (() => {
+    const tracks = [...document.querySelectorAll('.pslider__track')];
+    tracks.forEach((track) => [...track.children].forEach((img) => track.appendChild(img.cloneNode())));
+    const phone = matchMedia('(max-width: 760px)');
+    const setDurations = () => tracks.forEach((track) => {
+      const half = (phone.matches ? track.scrollHeight : track.scrollWidth) / 2;
+      if (half) track.style.setProperty('--dur', half / Number(track.dataset.speed) + 's');
+    });
+    // widths and heights come from the images, so re-measure as they load
+    tracks.forEach((track) => track.querySelectorAll('img').forEach((img) => img.addEventListener('load', setDurations)));
+    window.addEventListener('resize', setDurations);
+    setDurations();
   })();
 
   // Showcase: scroll progress through the tall scroller drives the grid. The
@@ -1054,6 +1479,28 @@
     else if (y < lastY - 4) nav.classList.remove('nav--hidden');  // ignores tiny jitters
     if (Math.abs(y - lastY) > 4) lastY = y;
   }
+
+  // ---- Reviews: cards rise in on scroll; the video plays on click ----------
+  (() => {
+    const cards = document.querySelectorAll('.reviews .reveal');
+    const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+      if (!e.isIntersecting) return;
+      // stagger the cards that enter together
+      const batch = entries.filter((x) => x.isIntersecting).indexOf(e);
+      e.target.style.transitionDelay = batch * 90 + 'ms';
+      e.target.classList.add('in');
+      io.unobserve(e.target);
+    }), { rootMargin: '0px 0px -10% 0px' });
+    cards.forEach((c) => io.observe(c));
+
+    const card = document.getElementById('reviewVideo');
+    const video = card.querySelector('video');
+    card.querySelector('.vcard__play').addEventListener('click', () => {
+      video.controls = true;
+      video.play();
+    });
+    video.addEventListener('play', () => card.classList.add('playing'));
+  })();
 
   window.addEventListener('scroll', () => { updateActive(); updateNav(); }, { passive: true });
   updateActive();
