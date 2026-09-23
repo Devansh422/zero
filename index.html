@@ -398,7 +398,13 @@
   main > section.marquee { color: #000; } /* no band: same paper background as the sections around it */
   .marquee {
     overflow: hidden;
-    padding: clamp(20px, 2.5vw, 40px) 0;
+    padding-top: clamp(20px, 2.5vw, 40px);
+  }
+  /* the line under the strip: same 3px rule as the section headers, on the page margins */
+  .marquee__rule {
+    height: 3px;
+    margin: clamp(20px, 2.5vw, 40px) 6vw 0;
+    background: currentColor;
   }
   .marquee__track {
     display: flex;
@@ -440,14 +446,17 @@
     gap: clamp(20px, 4vh, 48px);
     overflow: hidden;
   }
-  .showcase__head { text-align: center; }
-  .showcase__head .eyebrow { color: var(--red); }
-  .showcase__head h2 {
-    font-family: "Display", "Impact", sans-serif;
-    font-weight: 400;
-    font-size: clamp(56px, 8.5vw, 160px);
-    line-height: 0.9;
-    text-transform: uppercase;
+  /* same header as the curriculum section (.modules__head / __meta); the
+     stage already has the side padding, so no margins of its own here */
+  .showcase__head { width: 100%; }
+  .showcase__head .modules__head,
+  .showcase__head .modules__meta { margin: 0; }
+  /* in place of the label: a paragraph on the right, level with the title's last line */
+  .showcase__lead {
+    max-width: 30em;
+    font-size: clamp(16px, 1.6vw, 26px);
+    font-weight: 500;
+    line-height: 1.35;
   }
   .wgrid {
     flex: 1;
@@ -470,6 +479,64 @@
     will-change: transform, opacity;
   }
   .wgrid__img img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  /* ───────── Commitment ─────────
+     Left: a lead line in the body font, then the big gradient heading. Right:
+     the paragraph and an Enroll button, sitting level with the heading's foot. */
+  .commit { padding: clamp(64px, 8vw, 140px) 6vw; }
+  .commit__inner {
+    display: grid;
+    grid-template-columns: auto minmax(0, 36em);
+    justify-content: space-between;
+    align-items: end;
+    gap: 24px clamp(32px, 5vw, 96px);
+    /* lines above and below: the same 3px rule as the section headers */
+    border-top: 3px solid currentColor;
+    border-bottom: 3px solid currentColor;
+    padding: clamp(40px, 5vw, 88px) 0;
+  }
+  .commit__lead {
+    max-width: 22em;
+    margin-bottom: clamp(8px, 1vw, 16px);
+    font-size: clamp(16px, 1.5vw, 26px);
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--muted);
+  }
+  .commit__title {
+    font-family: "Display", "Impact", sans-serif;
+    font-weight: 400;
+    font-size: clamp(72px, 12vw, 230px);
+    line-height: 0.85;
+    text-transform: uppercase;
+    white-space: nowrap;
+    width: fit-content; /* the hero heading's gradient, run across the text */
+    background: var(--brand-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .commit__text {
+    font-size: clamp(17px, 1.7vw, 28px);
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+  .commit__btn {
+    display: inline-block;
+    margin-top: clamp(16px, 1.6vw, 28px);
+    padding: 0.45em 1em 0.4em;
+    border-radius: 14px;
+    background: var(--brand-gradient);
+    color: #fff;
+    font-family: "Display", "Impact", sans-serif;
+    font-size: clamp(22px, 2vw, 34px);
+    line-height: 1;
+    text-transform: uppercase;
+    box-shadow: 0 10px 30px rgba(250, 52, 88, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .commit__btn:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(250, 52, 88, 0.4); }
 
   /* ───────── 4. Enroll CTA ───────── */
   .enroll { padding: 80px 6vw 32px; }
@@ -539,7 +606,12 @@
     .gallery__tags { flex-wrap: wrap; }
     /* showcase: 3 columns (3 + 3 + 3); the outer columns of the desktop grid drop out */
     .showcase__scroll { height: 240vh; }
-    .showcase__stage { justify-content: center; padding-top: calc(var(--nav-top) + var(--nav-h) + 20px); } /* heading + grid as one centred group, below the nav */
+    .showcase__stage { justify-content: center; padding: calc(var(--nav-top) + var(--nav-h) + 20px) 16px clamp(24px, 5vh, 64px); } /* heading + grid as one centred group, below the nav */
+    /* commitment: heading lines, then the paragraph under them */
+    .commit { padding: 56px 16px; }
+    .marquee__rule { margin-left: 16px; margin-right: 16px; }
+    .commit__inner { grid-template-columns: 1fr; }
+    .commit__title { font-size: clamp(56px, 22vw, 120px); }
     .wgrid { flex: none; grid-template-columns: repeat(3, 1fr); }
     .wgrid__cell { aspect-ratio: 3 / 4; } /* portrait tiles on phones */
     .wgrid__cell:nth-child(6) { grid-column: auto; }
@@ -664,6 +736,7 @@
       <span class="marquee__item">Lifetime Website Access</span>
       <span class="marquee__item">Mentors</span>
     </div>
+    <div class="marquee__rule"></div>
   </section>
 
   <!-- Showcase: big image settles into a grid on scroll -->
@@ -671,24 +744,41 @@
     <div class="showcase__scroll" id="showcaseScroll">
       <div class="showcase__stage">
         <div class="showcase__head">
-          <span class="eyebrow">Student showcase</span>
-          <h2>Work that speaks for itself</h2>
+          <header class="modules__head">
+            <h2 class="modules__title">Work that speaks<br />for itself</h2>
+            <p class="showcase__lead">What you see here is exactly what you’ll learn to create in my classes from high-impact brand campaigns and print ads to the kind of work leading brands are creating in the industry today.</p>
+          </header>
+          <div class="modules__meta"><span>(2)</span><span>Student work</span></div>
         </div>
         <div class="wgrid" id="wgrid">
-          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/1.webp" alt="" loading="lazy" /></div></div>
-          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/6.webp" alt="" loading="lazy" /></div></div>
-          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/4.webp" alt="" loading="lazy" /></div></div>
-          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/7.webp" alt="" loading="lazy" /></div></div>
-          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/5.webp" alt="" loading="lazy" /></div></div>
-          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/9.webp" alt="" loading="lazy" /></div></div>
-          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/3.webp" alt="" /></div></div>
-          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/10.webp" alt="" loading="lazy" /></div></div>
-          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/8.webp" alt="" loading="lazy" /></div></div>
-          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/2.webp" alt="" loading="lazy" /></div></div>
-          <div class="wgrid__cell"><div class="wgrid__img"><img src="hero-poster.webp" alt="" loading="lazy" /></div></div>
-          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/6.webp" alt="" loading="lazy" /></div></div>
-          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/1.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/work-01.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/work-avia.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/work-03.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/work-04.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/work-05.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/work-06.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/work-07.webp" alt="" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/work-08.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/work-09.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/work-10.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/work-11.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/work-page-2.webp" alt="" loading="lazy" /></div></div>
+          <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/work-13.webp" alt="" loading="lazy" /></div></div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Commitment -->
+  <section class="commit">
+    <div class="commit__inner">
+      <div>
+        <p class="commit__lead">We’re Not Just Teaching You Graphic Design. We’re Building Your Career.</p>
+        <h2 class="commit__title">Ready for<br />commitment?</h2>
+      </div>
+      <div>
+        <p class="commit__text">This 16-week program is built to make you industry-ready. Complete the assignments, apply what you learn, and build your skills through real projects. Every assignment becomes a part of your final portfolio so you don’t just learn, you build the work that can get you hired.</p>
+        <a href="#enroll" class="commit__btn">Enroll now</a>
       </div>
     </div>
   </section>
