@@ -800,30 +800,188 @@
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.55);
   }
-  .mentor__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .mentor__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; /* keep the face in view */ }
+  /* ───────── Certificate: the section header, then steps left, certificate right ───────── */
+  .cert { padding: 0 6vw clamp(64px, 8vw, 140px); }
+  .cert .modules__head,
+  .cert .modules__meta { margin: 0; }
+  .cert__body {
+    margin-top: clamp(24px, 3vw, 56px);
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: center;
+    gap: clamp(24px, 4vw, 80px);
+  }
+  .cert__steps { list-style: none; counter-reset: step; }
+  .cert__steps li {
+    counter-increment: step;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px clamp(14px, 1.4vw, 24px);
+    padding: clamp(16px, 1.6vw, 28px) 0;
+    border-top: 1px solid rgba(22, 22, 26, 0.15);
+  }
+  .cert__steps li:last-child { border-bottom: 1px solid rgba(22, 22, 26, 0.15); }
+  .cert__steps li::before {
+    content: counter(step, decimal-leading-zero);
+    grid-row: span 2;
+    font-family: "Display", "Impact", sans-serif;
+    font-size: clamp(36px, 3.4vw, 64px);
+    line-height: 0.9;
+    background: var(--brand-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .cert__steps strong { font-size: clamp(18px, 1.5vw, 28px); font-weight: 700; line-height: 1.2; }
+  .cert__steps span { font-size: clamp(15px, 1.1vw, 19px); color: var(--muted); line-height: 1.4; }
+  /* a sample certificate drawn in CSS; certificate.webp covers it once added */
+  .cert__doc {
+    position: relative;
+    aspect-ratio: 1.414 / 1; /* A-series landscape */
+    border-radius: clamp(8px, 0.8vw, 14px);
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 30px 80px rgba(22, 22, 26, 0.18), 0 4px 14px rgba(22, 22, 26, 0.08);
+    rotate: -2deg;
+  }
+  .cert__doc > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+  .cert__sample {
+    position: absolute;
+    inset: 4%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5% 6%;
+    border: 2px solid transparent;
+    border-image: var(--brand-gradient) 1;
+    text-align: center;
+    container-type: inline-size;
+  }
+  .cert__sample img { height: 11cqi; width: auto; }
+  .cert__kicker { font-size: 2.6cqi; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); }
+  .cert__title {
+    font-family: "Display", "Impact", sans-serif;
+    font-size: 11cqi;
+    line-height: 0.9;
+    text-transform: uppercase;
+    background: var(--brand-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .cert__line { font-size: 2.4cqi; color: var(--muted); }
+  .cert__name { min-width: 60%; padding-bottom: 1cqi; border-bottom: 1px solid var(--ink); font-size: 5cqi; font-weight: 600; font-style: italic; }
+  .cert__sign { display: flex; justify-content: space-between; width: 100%; font-size: 2.2cqi; color: var(--muted); }
+  .cert__sign b { display: block; font-size: 2.8cqi; color: var(--ink); }
   @keyframes pslide-x { to { transform: translateX(-50%); } }
   @keyframes pslide-y { to { transform: translateY(-50%); } }
 
-  /* ───────── 4. Enroll CTA ───────── */
-  .enroll { padding: 80px 6vw 32px; }
+  /* ───────── 4. Enroll CTA ─────────
+     One dark card across the page like the mentor card: the offer on the left
+     (heading, price, button), everything the course includes on the right. */
+  .enroll { padding: 0 6vw 32px; }
   .enroll__panel {
-    background: var(--red);
-    color: #fff;
-    border-radius: 48px;
-    padding: 96px 6vw;
-    text-align: center;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(32px, 5vw, 96px);
+    padding: clamp(28px, 4.5vw, 88px);
+    border-radius: clamp(24px, 3vw, 56px);
+    background: var(--ink);
+    color: var(--paper);
   }
-  .enroll__panel h2 {
-    font-family: "Display", "Impact", sans-serif;
-    font-weight: 400;
-    font-size: clamp(56px, 10vw, 150px);
-    line-height: 0.9;
+  .enroll__offer { display: flex; flex-direction: column; align-items: flex-start; }
+  .enroll__tag {
+    padding: 0.4em 0.9em;
+    border: 1px solid rgba(247, 239, 237, 0.3);
+    border-radius: 999px;
+    font-size: clamp(13px, 1vw, 17px);
+    font-weight: 600;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
-  .enroll__panel p { font-size: clamp(17px, 1.6vw, 21px); max-width: 560px; margin: 20px auto 36px; opacity: 0.92; }
-  .enroll__price { display: flex; justify-content: center; align-items: baseline; gap: 14px; margin-bottom: 32px; }
-  .enroll__price strong { font-size: 44px; font-weight: 700; }
-  .enroll__price s { opacity: 0.65; font-size: 20px; }
+  .enroll__tag::before { content: "\25CF"; margin-right: 0.5em; color: #fa3458; } /* a pink dot */
+  .enroll__panel h2 {
+    margin-top: clamp(16px, 1.6vw, 28px);
+    width: fit-content;
+    font-family: "Display", "Impact", sans-serif;
+    font-weight: 400;
+    font-size: clamp(64px, 9vw, 180px);
+    line-height: 0.85;
+    text-transform: uppercase;
+    padding: 0.06em 0;
+    background: var(--brand-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .enroll__lead {
+    max-width: 26em;
+    margin-top: clamp(14px, 1.4vw, 24px);
+    font-size: clamp(17px, 1.4vw, 24px);
+    font-weight: 500;
+    line-height: 1.4;
+    color: rgba(247, 239, 237, 0.8);
+  }
+  .enroll__price {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px clamp(12px, 1.2vw, 20px);
+    margin-top: auto; /* price + button sit at the card's foot */
+    padding-top: clamp(28px, 3vw, 56px);
+  }
+  .enroll__price strong {
+    font-family: "Display", "Impact", sans-serif;
+    font-weight: 400;
+    font-size: clamp(56px, 5.6vw, 110px);
+    line-height: 0.9;
+  }
+  .enroll__price s { font-size: clamp(18px, 1.6vw, 28px); opacity: 0.5; }
+  .enroll__price em {
+    align-self: center;
+    padding: 0.3em 0.7em;
+    border-radius: 999px;
+    background: var(--brand-gradient);
+    color: #fff;
+    font-size: clamp(13px, 1vw, 17px);
+    font-style: normal;
+    font-weight: 700;
+  }
+  .enroll__btn { margin-top: clamp(16px, 1.6vw, 28px); } /* with .commit__btn: the same button */
+  /* what's included: a checked list between thin rules */
+  .enroll__features h3 {
+    padding-bottom: clamp(12px, 1.2vw, 20px);
+    border-bottom: 3px solid currentColor;
+    font-size: clamp(15px, 1.3vw, 24px);
+    font-weight: 600;
+  }
+  .enroll__features ul { list-style: none; }
+  .enroll__features li {
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+    padding: clamp(11px, 1vw, 17px) 0;
+    border-bottom: 1px solid rgba(247, 239, 237, 0.14);
+    font-size: clamp(16px, 1.2vw, 21px);
+    font-weight: 500;
+    line-height: 1.35;
+  }
+  .enroll__features li::before {
+    content: "\2713";
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 1.35em;
+    height: 1.35em;
+    translate: 0 0.2em;
+    border-radius: 50%;
+    background: var(--brand-gradient);
+    color: #fff;
+    font-size: 0.8em;
+    font-weight: 700;
+  }
   .btn--light { background: #fff; color: var(--red); }
   .footer {
     display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
@@ -861,6 +1019,9 @@
     .hero__line:first-child { font-size: calc(100cqi / var(--fit-first, 3.03)); }
     .hero__features { grid-template-columns: repeat(3, 1fr); column-gap: 10px; }
     .intro { padding: 32px 16px 48px; }
+    /* at most 3 lines: one run of text (no break), sized with the screen width */
+    .intro__text br { display: none; }
+    .intro__text { font-size: 3.35vw; }
     /* the nav stays visible on phones, so both pinned sections leave room for it */
     .hgallery__pin { --pin-gap: 20px; padding-top: calc(var(--nav-top) + var(--nav-h) + var(--pin-gap)); }
     .modules__head, .modules__meta { margin: 0 16px; }
@@ -887,10 +1048,14 @@
     /* mentor: photo on top, then the text */
     .mentor { padding: 0 16px 48px; }
     .mentor__card { grid-template-columns: 1fr; }
+    /* certificate: under the steps */
+    .cert { padding: 0 16px 56px; }
+    .cert__body { grid-template-columns: 1fr; }
+    .cert__doc { rotate: none; }
     .mentor__photo { order: -1; min-height: 0; aspect-ratio: 4 / 5; }
     .mentor__stats { grid-template-columns: auto auto; gap: 14px 28px; }
     .mentor__stats li:last-child { grid-column: 1 / -1; } /* the brands get a row of their own */
-    /* projects: two columns side by side, running upwards */
+     /* projects: two columns side by side, running upwards */
     .pslider { margin: 24px -16px 0; height: 150vw; grid-template-columns: 1fr 1fr; gap: 10px; }
     .pslider__track { width: auto; flex-direction: column; animation-name: pslide-y; }
     .pslider__track img { width: 100%; height: auto; margin: 0 0 10px; }
@@ -899,8 +1064,8 @@
     .wgrid__cell { aspect-ratio: 3 / 4; } /* portrait tiles on phones */
     .wgrid__cell:nth-child(6) { grid-column: auto; }
     .wgrid__cell:nth-child(1), .wgrid__cell:nth-child(5), .wgrid__cell:nth-child(9), .wgrid__cell:nth-child(13) { display: none; }
-    .enroll { padding: 60px 16px 24px; }
-    .enroll__panel { border-radius: 32px; padding: 64px 20px; }
+    .enroll { padding: 0 16px 24px; }
+    .enroll__panel { grid-template-columns: 1fr; padding: 32px 20px; } /* the features follow the button */
   }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -962,7 +1127,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H4M10 18l-6-6 6-6" /></svg>
       <a href="#modules">View curriculum</a>
     </div>
-    <p class="intro__text">More than a design course, a complete system to help you become a designer.<br />Learn, practice, get feedback, improve your skills, and build a portfolio that represents your work.</p>
+    <p class="intro__text">More than a design course, a complete system to help you become a designer. <br />Learn, practice, get feedback, improve your skills, and build a portfolio that represents your work.</p>
   </section>
 
   <!-- 2. Horizontal parallax gallery -->
@@ -1129,8 +1294,7 @@
   </section>
 
   <!-- Student projects: same header as the reviews above, then two endless
-       image rows. PLACEHOLDER images (the client work) until the student
-       projects are added. data-speed is in px per second. -->
+       image rows of student work. data-speed is in px per second. -->
   <section class="reviews projects" id="projects">
     <header class="modules__head">
       <h2 class="modules__title">Designs that went from “just an<br />assignment” to 🔥</h2>
@@ -1140,26 +1304,19 @@
 
     <div class="pslider" aria-hidden="true">
       <div class="pslider__track" data-speed="110">
-        <img src="gallery/work-01.webp" alt="" decoding="async" />
-        <img src="gallery/card-1.webp" alt="" decoding="async" />
-        <img src="gallery/work-avia.webp" alt="" decoding="async" />
-        <img src="gallery/work-03.webp" alt="" decoding="async" />
-        <img src="gallery/card-2.webp" alt="" decoding="async" />
-        <img src="gallery/work-04.webp" alt="" decoding="async" />
-        <img src="gallery/work-05.webp" alt="" decoding="async" />
-        <img src="gallery/card-3.webp" alt="" decoding="async" />
-        <img src="gallery/work-06.webp" alt="" decoding="async" />
+        <img src="gallery/student-1.webp" alt="" decoding="async" />
+        <img src="gallery/student-3.webp" alt="" decoding="async" />
+        <img src="gallery/student-10.webp" alt="" decoding="async" />
+        <img src="gallery/student-4.webp" alt="" decoding="async" />
+        <img src="gallery/student-7.webp" alt="" decoding="async" />
       </div>
       <div class="pslider__track" data-speed="60">
-        <img src="gallery/work-07.webp" alt="" decoding="async" />
-        <img src="gallery/card-4.webp" alt="" decoding="async" />
-        <img src="gallery/work-08.webp" alt="" decoding="async" />
-        <img src="gallery/work-09.webp" alt="" decoding="async" />
-        <img src="gallery/card-5.webp" alt="" decoding="async" />
-        <img src="gallery/work-10.webp" alt="" decoding="async" />
-        <img src="gallery/work-11.webp" alt="" decoding="async" />
-        <img src="gallery/work-page-2.webp" alt="" decoding="async" />
-        <img src="gallery/work-13.webp" alt="" decoding="async" />
+        <img src="gallery/student-2.webp" alt="" decoding="async" />
+        <img src="gallery/student-8.webp" alt="" decoding="async" />
+        <img src="gallery/student-11.webp" alt="" decoding="async" />
+        <img src="gallery/student-5.webp" alt="" decoding="async" />
+        <img src="gallery/student-9.webp" alt="" decoding="async" />
+        <img src="gallery/student-6.webp" alt="" decoding="async" />
       </div>
     </div>
   </section>
@@ -1172,8 +1329,7 @@
     </figure>
   </section>
 
-  <!-- Mentor: bio card. Drop the photo in as mentor.webp; until then the
-       gradient placeholder shows. -->
+  <!-- Mentor: bio card, photo on the right (mentor.webp) -->
   <section class="mentor" id="mentor">
     <div class="mentor__card">
       <div class="mentor__body">
@@ -1196,14 +1352,61 @@
     </div>
   </section>
 
+  <!-- Certificate: same header as the other sections, steps left, certificate
+       right. DRAFT copy; the CSS sample shows until certificate.webp is added. -->
+  <section class="cert" id="certificate">
+    <header class="modules__head">
+      <h2 class="modules__title">Finish strong.<br />Get certified.</h2>
+      <p class="showcase__lead">Complete the 16-week program and every assignment to earn your Zero to Hero certificate, proof of the skills behind your portfolio.</p>
+    </header>
+    <div class="modules__meta"><span>(6)</span><span>Certification</span></div>
+
+    <div class="cert__body">
+      <ol class="cert__steps">
+        <li><strong>Complete the 16-week program</strong><span>Every module, from the basics to industry-level brand work.</span></li>
+        <li><strong>Submit every assignment</strong><span>Each one reviewed, each one a real portfolio piece.</span></li>
+        <li><strong>Earn your certificate</strong><span>Graduate with a certificate and a portfolio that gets you hired.</span></li>
+      </ol>
+      <figure class="cert__doc">
+        <div class="cert__sample" aria-hidden="true">
+          <img src="logo.png" alt="" />
+          <p class="cert__kicker">Certificate of completion</p>
+          <p class="cert__title">Zero to Hero</p>
+          <p class="cert__line">This certifies that</p>
+          <p class="cert__name">Your Name</p>
+          <p class="cert__line">has completed the 16-week Graphic Design Program</p>
+          <div class="cert__sign"><span><b>Vibhu Trivedi</b>Mentor</span><span><b>2026</b>Year</span></div>
+        </div>
+        <img src="certificate.webp" alt="Zero to Hero certificate of completion" onerror="this.remove()" />
+      </figure>
+    </div>
+  </section>
+
   <!-- 4. Enroll CTA -->
   <section class="enroll" id="enroll">
     <div class="enroll__panel">
-      <span class="eyebrow" style="color:#fff">Limited seats</span>
-      <h2>Become the hero</h2>
-      <p>Join 5,000+ students learning design, building portfolios and getting paid for their creativity.</p>
-      <div class="enroll__price"><strong>₹2,999</strong><s>₹9,999</s></div>
-      <a href="#" class="btn btn--light">Enroll now →</a>
+      <div class="enroll__offer">
+        <span class="enroll__tag">Limited seats</span>
+        <h2>Become<br />the hero</h2>
+        <p class="enroll__lead">Join 5,000+ students learning design, building portfolios and getting paid for their creativity.</p>
+        <div class="enroll__price"><strong>₹2,999</strong><s>₹9,999</s><em>70% off</em></div>
+        <a href="#" class="commit__btn enroll__btn">Enroll now →</a>
+      </div>
+      <div class="enroll__features">
+        <h3>Everything included</h3>
+        <ul>
+          <li>16-week program with 320+ hours of lectures</li>
+          <li>Live doubt classes</li>
+          <li>Weekly assignments on Google Classroom</li>
+          <li>Expert feedback on every submission</li>
+          <li>Photoshop, Illustrator, Premiere Pro, After Effects &amp; AI tools</li>
+          <li>AI design, image and video workflows</li>
+          <li>Live mentorship and guest sessions with industry experts</li>
+          <li>Freelancing, client work and career guidance</li>
+          <li>A portfolio of real projects</li>
+          <li>Certificate of completion</li>
+        </ul>
+      </div>
     </div>
     <footer class="footer">
       <span>© 2026 Zero to Hero. All rights reserved.</span>
@@ -1305,16 +1508,29 @@
   // along the width in rows (desktop), along the height in columns (phones).
   (() => {
     const tracks = [...document.querySelectorAll('.pslider__track')];
-    tracks.forEach((track) => [...track.children].forEach((img) => track.appendChild(img.cloneNode())));
     const phone = matchMedia('(max-width: 760px)');
+    const originals = tracks.map((track) => [...track.children]);
+    // One set of images must cover the slider's width (height on phones), or a
+    // gap shows before the loop restarts: repeat the set until it does, then
+    // double it so -50% is exactly one set.
+    const fill = () => tracks.forEach((track, i) => {
+      track.replaceChildren(...originals[i]);
+      const box = track.parentElement.getBoundingClientRect();
+      const need = phone.matches ? box.height : box.width;
+      const size = () => (phone.matches ? track.scrollHeight : track.scrollWidth);
+      for (let n = 0; size() < need + 100 && n < 8; n++) originals[i].forEach((img) => track.appendChild(img.cloneNode()));
+      [...track.children].forEach((img) => track.appendChild(img.cloneNode()));
+    });
     const setDurations = () => tracks.forEach((track) => {
       const half = (phone.matches ? track.scrollHeight : track.scrollWidth) / 2;
       if (half) track.style.setProperty('--dur', half / Number(track.dataset.speed) + 's');
     });
     // widths and heights come from the images, so re-measure as they load
-    tracks.forEach((track) => track.querySelectorAll('img').forEach((img) => img.addEventListener('load', setDurations)));
-    window.addEventListener('resize', setDurations);
-    setDurations();
+    const refresh = () => { fill(); setDurations(); };
+    // sizes come from the images, so redo it as each one loads and on resize
+    originals.flat().forEach((img) => img.addEventListener('load', refresh));
+    window.addEventListener('resize', refresh);
+    refresh();
   })();
 
   // Showcase: scroll progress through the tall scroller drives the grid. The
