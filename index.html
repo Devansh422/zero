@@ -73,7 +73,7 @@
   }
   .nav__links a:hover { background: #f3f3f3; }
   .nav__links a.active { background: var(--red); color: #fff; }
-  /* slid up out of view while the horizontal scroll section is pinned */
+  /* slid up out of view while scrolling down below the hero (see the script) */
   .nav { transition: transform 0.4s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.3s; }
   .nav--hidden { transform: translate(-50%, calc(-100% - var(--nav-top) - 12px)); opacity: 0; pointer-events: none; }
   .nav__toggle {
@@ -272,7 +272,7 @@
     height: 100vh;
     /* the same gap above the title as under the cards */
     --pin-gap: clamp(24px, 3vw, 48px);
-    padding: var(--pin-gap) 0; /* the nav is hidden while this is pinned */
+    padding: var(--pin-gap) 0; /* the nav is hidden while scrolling down through this */
     display: flex;
     flex-direction: column;
   }
@@ -361,6 +361,10 @@
     font-size: clamp(26px, 3.4vw, 64px);
     line-height: 0.95;
     text-transform: uppercase;
+    /* wide enough that the longest heading ("04 — Learn from the industry
+       experts") takes two lines at most; the lines are balanced */
+    min-width: 5em;
+    text-wrap: balance;
   }
   .gallery__caption p {
     font-size: clamp(15px, 1.35vw, 23px);
@@ -368,7 +372,8 @@
     line-height: 1.3;
     color: var(--muted);
   }
-  /* Tags: bordered boxes on one line under the sub-text */
+  /* Tags: bordered boxes on one line under the sub-text (the card-sizing
+     script widens the cards until they fit; they wrap on phones) */
   .gallery__tags {
     list-style: none;
     display: flex;
@@ -387,7 +392,7 @@
     white-space: nowrap;
   }
 
-  /* ───────── Marquee strip (between the curriculum and the reviews) ─────────
+  /* ───────── Marquee strip (between the curriculum and the showcase) ─────────
      The script appends a copy of the items; the track slides left by exactly
      one copy (-50%), so the loop has no seam. */
   main > section.marquee { color: #000; } /* no band: same paper background as the sections around it */
@@ -428,8 +433,7 @@
     top: 0;
     height: 100vh;
     height: 100svh;
-    /* top: clear the floating nav */
-    padding: calc(var(--nav-top) + var(--nav-h) + clamp(20px, 4vh, 48px)) 6vw clamp(24px, 5vh, 64px);
+    padding: clamp(24px, 5vh, 64px) 6vw;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -466,41 +470,6 @@
     will-change: transform, opacity;
   }
   .wgrid__img img { display: block; width: 100%; height: 100%; object-fit: cover; }
-
-  /* ───────── 3. On-scroll image columns ───────── */
-  /* Ported from Codrops "On-Scroll Column & Row Animations", demo 2
-     (OnScrollColumnsRows/index2.html + js/index2.js): the middle column
-     glides against the other two as the grid crosses the viewport, and the
-     outer columns' tiles rotate/slide open from their bottom corner as each
-     one scrolls through. Re-implemented in plain JS (no GSAP/ScrollTrigger/
-     Lenis) so it stays dependency-free, and made responsive: 3 columns on
-     desktop, 2 on mobile (third column simply hidden). */
-  .reviews { padding: 96px 0 0; }
-  .oscols {
-    width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 10vh 6vw 14vh;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: clamp(8px, 1.4vw, 20px);
-    align-items: start;
-  }
-  .oscols__col { display: grid; gap: clamp(8px, 1.4vw, 20px); }
-  .oscols__item { position: relative; z-index: 1; }
-  .oscols__item-tile {
-    width: 100%;
-    aspect-ratio: 1;
-    border-radius: 20px;
-    overflow: hidden;
-    will-change: transform;
-  }
-  .oscols__item-tile--1 { background: radial-gradient(120% 140% at 15% 15%, #ff8a6b 0%, transparent 55%), radial-gradient(100% 120% at 90% 90%, #ffd166 0%, transparent 55%), var(--red); }
-  .oscols__item-tile--2 { background: radial-gradient(120% 140% at 85% 15%, #9a5cd0 0%, transparent 55%), radial-gradient(100% 120% at 10% 90%, #2f2fd0 0%, transparent 55%), var(--purple); }
-  .oscols__item-tile--3 { background: radial-gradient(120% 140% at 15% 85%, #3a3a44 0%, transparent 55%), radial-gradient(100% 120% at 90% 15%, #f0233b 0%, transparent 50%), var(--ink); }
-  .oscols__item-tile--4 { background: radial-gradient(120% 140% at 88% 88%, #ffd166 0%, transparent 55%), radial-gradient(100% 120% at 10% 10%, #f0233b 0%, transparent 55%), #ff6a3d; }
-  .oscols__item-tile--5 { background: radial-gradient(120% 140% at 12% 88%, #7b5cd6 0%, transparent 55%), radial-gradient(100% 120% at 88% 12%, #3aa1e0 0%, transparent 55%), #2f2fd0; }
-  .oscols__item-tile--6 { background: radial-gradient(120% 140% at 80% 20%, #3aa17e 0%, transparent 55%), radial-gradient(100% 120% at 15% 85%, #16161a 0%, transparent 55%), #1e8f63; }
 
   /* ───────── 4. Enroll CTA ───────── */
   .enroll { padding: 80px 6vw 32px; }
@@ -559,7 +528,8 @@
     .hero__line:first-child { font-size: calc(100cqi / var(--fit-first, 3.03)); }
     .hero__features { grid-template-columns: repeat(3, 1fr); column-gap: 10px; }
     .intro { padding: 32px 16px 48px; }
-    .hgallery__pin { --pin-gap: 20px; }
+    /* the nav stays visible on phones, so both pinned sections leave room for it */
+    .hgallery__pin { --pin-gap: 20px; padding-top: calc(var(--nav-top) + var(--nav-h) + var(--pin-gap)); }
     .modules__head, .modules__meta { margin: 0 16px; }
     .gallery__wrapper { padding: 0 16px; }
     /* wider cards on a phone, capped in height so they don't become tall strips */
@@ -569,13 +539,11 @@
     .gallery__tags { flex-wrap: wrap; }
     /* showcase: 3 columns (3 + 3 + 3); the outer columns of the desktop grid drop out */
     .showcase__scroll { height: 240vh; }
-    .showcase__stage { justify-content: center; } /* heading + grid as one centred group */
+    .showcase__stage { justify-content: center; padding-top: calc(var(--nav-top) + var(--nav-h) + 20px); } /* heading + grid as one centred group, below the nav */
     .wgrid { flex: none; grid-template-columns: repeat(3, 1fr); }
     .wgrid__cell { aspect-ratio: 3 / 4; } /* portrait tiles on phones */
     .wgrid__cell:nth-child(6) { grid-column: auto; }
     .wgrid__cell:nth-child(1), .wgrid__cell:nth-child(5), .wgrid__cell:nth-child(9), .wgrid__cell:nth-child(13) { display: none; }
-    .oscols { grid-template-columns: repeat(2, 1fr); padding: 8vh 16px 10vh; }
-    .oscols__col:nth-child(3) { display: none; }
     .enroll { padding: 60px 16px 24px; }
     .enroll__panel { border-radius: 32px; padding: 64px 20px; }
   }
@@ -597,7 +565,7 @@
   <ul class="nav__links">
     <li><a href="#home">Home</a></li>
     <li><a href="#modules">Modules</a></li>
-    <li><a href="#reviews">Student review</a></li>
+    <li><a href="#showcase">Student review</a></li>
     <li><a href="#enroll">Enroll</a></li>
   </ul>
 </nav>
@@ -671,7 +639,7 @@
             </figure>
             <figure class="gallery__item">
               <picture class="gallery__media">
-                <img src="gallery/4.webp" alt="" class="gallery__media__image" draggable="false" />
+                <img src="gallery/card-4.webp" alt="" class="gallery__media__image" draggable="false" />
               </picture>
               <figcaption class="gallery__caption"><h3>04 — Learn from the industry experts</h3><div class="gallery__detail"><p>Experienced designers aur creators se directly seekho aur industry ko samjho.</p><ul class="gallery__tags"><li>Live Mentorship</li><li>Guest Sessions</li><li>Industry Experts</li><li>Real Insights</li></ul></div></figcaption>
             </figure>
@@ -721,35 +689,6 @@
           <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/6.webp" alt="" loading="lazy" /></div></div>
           <div class="wgrid__cell"><div class="wgrid__img"><img src="gallery/1.webp" alt="" loading="lazy" /></div></div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3. On-scroll image columns -->
-  <section class="reviews" id="reviews">
-    <div class="section-head">
-      <span class="eyebrow">Student review</span>
-      <h2>Real students, real wins</h2>
-    </div>
-
-    <div class="oscols" id="oscols">
-      <div class="oscols__col" data-role="tilt-left">
-        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--1"></div></figure>
-        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--4"></div></figure>
-        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--2"></div></figure>
-        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--5"></div></figure>
-      </div>
-      <div class="oscols__col" data-role="stagger">
-        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--3"></div></figure>
-        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--6"></div></figure>
-        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--4"></div></figure>
-        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--1"></div></figure>
-      </div>
-      <div class="oscols__col" data-role="tilt-right">
-        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--5"></div></figure>
-        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--2"></div></figure>
-        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--6"></div></figure>
-        <figure class="oscols__item"><div class="oscols__item-tile oscols__item-tile--3"></div></figure>
       </div>
     </div>
   </section>
@@ -848,44 +787,6 @@
     runWhileVisible(section, render);
   })();
 
-  // ---- Section 3: on-scroll image columns ---------------------------------
-  // Ported from OnScrollColumnsRows/index2.js (Codrops "On-Scroll Column &
-  // Row Animations", demo 2): the middle column glides against the other two
-  // across the grid's scroll range, and each outer tile rotates/slides open
-  // from its bottom corner as it crosses the viewport. Re-implemented in
-  // plain JS (no GSAP/ScrollTrigger/Lenis) to stay dependency-free. Purely
-  // decorative, so it's skipped entirely under reduced motion.
-  if (!reduceMotion) {
-    (() => {
-      const grid = document.getElementById('oscols');
-      const staggerCol = grid.querySelector('[data-role="stagger"]');
-      const tiltItems = [...grid.querySelectorAll('[data-role="tilt-left"] .oscols__item, [data-role="tilt-right"] .oscols__item')]
-        .map((figure) => ({
-          figure,
-          tile: figure.querySelector('.oscols__item-tile'),
-          side: figure.closest('[data-role="tilt-left"]') ? -1 : 1,
-        }));
-
-      function progressFor(rect, vh) {
-        return clamp(0, 1, (vh - rect.top) / (vh + rect.height));
-      }
-
-      runWhileVisible(grid, () => {
-        const vh = window.innerHeight;
-
-        const gp = progressFor(grid.getBoundingClientRect(), vh);
-        staggerCol.style.transform = `translate3d(0, ${-20 * gp}%, 0)`;
-
-        tiltItems.forEach(({ figure, tile, side }) => {
-          if (figure.offsetParent === null) return; // column hidden at this breakpoint
-          const p = progressFor(figure.getBoundingClientRect(), vh);
-          tile.style.transformOrigin = side < 0 ? '0% 100%' : '100% 100%';
-          tile.style.transform = `rotate(${side * 6 * p}deg) translate3d(${side * 10 * p}%, 0, 0)`;
-        });
-      });
-    })();
-  }
-
   // Marquee: append a copy of the items so sliding by -50% loops seamlessly
   (() => {
     const track = document.querySelector('.marquee__track');
@@ -953,13 +854,21 @@
   // strips (and the images above them) line up across all five cards. On
   // desktop the image then takes the height left in the pinned section, but
   // never less than MIN_IMAGE, and the card's width follows from that height
-  // at 16:9. Strip height depends on card width (text wrapping) and vice
-  // versa, so it settles in two passes. Phones keep their CSS portrait cards.
+  // at 16:9 — widened, if needed, until every strip's text fits its rules:
+  // heading ≤ 2 lines, sub-text ≤ 2 lines, tags on one line. Strip height
+  // depends on card width (text wrapping) and vice versa, so it repeats until
+  // they settle. Phones keep their CSS portrait cards.
   (() => {
     const MIN_IMAGE = 320; // px, smallest image height on desktop
     const wrapper = document.querySelector('.gallery__wrapper');
     const cards = [...document.querySelectorAll('.gallery__item')];
     const strips = cards.map((card) => card.querySelector('.gallery__caption'));
+    const lines = (el) => Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight));
+    const textFits = () => strips.every((s) =>
+      s.scrollWidth <= s.clientWidth + 1 &&            // tags on one line push the strip wider if they don't fit
+      lines(s.querySelector('h3')) <= 2 &&
+      lines(s.querySelector('p')) <= 2);
+    const setWidth = (w) => cards.forEach((c) => (c.style.width = w + 'px'));
     const equalize = () => {
       strips.forEach((s) => (s.style.minHeight = ''));
       const tallest = Math.max(...strips.map((s) => s.getBoundingClientRect().height));
@@ -970,10 +879,15 @@
       cards.forEach((c) => { c.style.width = ''; c.style.height = ''; });
       let strip = equalize();
       if (window.innerWidth > 760) {
-        for (let pass = 0; pass < 2; pass++) {
+        for (let pass = 0; pass < 5; pass++) {
           const image = Math.max(MIN_IMAGE, wrapper.clientHeight - strip);
-          cards.forEach((c) => { c.style.width = image * (16 / 9) + 'px'; c.style.height = image + strip + 'px'; });
-          strip = equalize();
+          let width = image * (16 / 9);
+          setWidth(width);
+          while (!textFits() && width < window.innerWidth * 0.9) setWidth((width += 24));
+          cards.forEach((c) => (c.style.height = image + strip + 'px'));
+          const settled = equalize();
+          if (Math.abs(settled - strip) < 1) break;
+          strip = settled;
         }
       }
       document.dispatchEvent(new Event('cards:sized')); // the scroll distance depends on the card widths
@@ -1033,11 +947,17 @@
     links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + current.id));
   }
 
-  // Hide the nav while the horizontal scroll section fills the screen
-  const hgallery = document.getElementById('hgallery');
+  // Nav (desktop): always shown while the hero is on screen; below it, hidden
+  // when scrolling down and shown again as soon as you scroll up. On phones it
+  // is always shown.
+  const heroWrap = document.querySelector('.hero-wrap');
+  let lastY = window.scrollY;
   function updateNav() {
-    const r = hgallery.getBoundingClientRect();
-    nav.classList.toggle('nav--hidden', r.top <= 1 && r.bottom >= window.innerHeight - 1);
+    const y = window.scrollY;
+    if (window.innerWidth <= 760 || heroWrap.getBoundingClientRect().bottom > 0) nav.classList.remove('nav--hidden'); // always shown on phones
+    else if (y > lastY + 4) nav.classList.add('nav--hidden');     // a few px of slack
+    else if (y < lastY - 4) nav.classList.remove('nav--hidden');  // ignores tiny jitters
+    if (Math.abs(y - lastY) > 4) lastY = y;
   }
 
   window.addEventListener('scroll', () => { updateActive(); updateNav(); }, { passive: true });
